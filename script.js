@@ -1,6 +1,4 @@
-const revealItems = Array.from(document.querySelectorAll('.reveal'));
-
-const observer = new IntersectionObserver(
+const revealObserver = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) {
@@ -8,7 +6,7 @@ const observer = new IntersectionObserver(
       }
 
       entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
+      revealObserver.unobserve(entry.target);
     });
   },
   {
@@ -17,15 +15,52 @@ const observer = new IntersectionObserver(
   }
 );
 
-revealItems.forEach((item, index) => {
-  item.style.transitionDelay = `${Math.min(index * 70, 420)}ms`;
-  observer.observe(item);
-});
+function initReveal(root = document) {
+  const revealItems = Array.from(root.querySelectorAll('.reveal'));
 
-const yaTracks = Array.from(document.querySelectorAll('.ya-track'));
+  revealItems.forEach((item, index) => {
+    item.classList.remove('visible');
+    item.style.transitionDelay = `${Math.min(index * 70, 420)}ms`;
+    revealObserver.observe(item);
+  });
+}
 
-if (yaTracks.length > 0) {
+function initYear() {
+  const yearNode = document.getElementById('year');
+  if (yearNode) {
+    yearNode.textContent = String(new Date().getFullYear());
+  }
+}
+
+function initCodingDays() {
+  const codingDaysNode = document.getElementById('codingDays');
+  if (!codingDaysNode) {
+    return;
+  }
+
+  const startDate = new Date('2023-09-01T00:00:00');
+  const now = new Date();
+
+  const startUtc = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
+  const nowUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const days = Math.max(0, Math.floor((nowUtc - startUtc) / 86400000));
+
+  codingDaysNode.textContent = String(days);
+}
+
+function initParallax() {
+  if (window.__yaParallaxBound) {
+    return;
+  }
+
+  window.__yaParallaxBound = true;
+
   window.addEventListener('pointermove', (event) => {
+    const yaTracks = Array.from(document.querySelectorAll('.ya-track'));
+    if (yaTracks.length === 0) {
+      return;
+    }
+
     const x = (event.clientX / window.innerWidth - 0.5) * 22;
     const y = (event.clientY / window.innerHeight - 0.5) * 14;
 
@@ -37,53 +72,114 @@ if (yaTracks.length > 0) {
   });
 }
 
-document.body.classList.add('page-enter');
-setTimeout(() => {
-  document.body.classList.remove('page-enter');
-}, 760);
+function initPage(root = document) {
+  initReveal(root);
+  initYear();
+  initCodingDays();
+}
 
-const internalLinks = Array.from(document.querySelectorAll('a[data-nav-link="true"]'));
-let isLeaving = false;
+let isNavigating = false;
 
-internalLinks.forEach((link) => {
-  link.addEventListener('click', (event) => {
-    const href = link.getAttribute('href');
+async function navigateSeamlessly(url, { pushHistory = true, resetScroll = true } = {}) {
+  if (isNavigating) {
+    return;
+  }
 
-    if (!href || href.startsWith('#') || href.startsWith('mailto:')) {
+  isNavigating = true;
+  document.body.classList.add('is-routing');
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'X-Requested-With': 'spa-navigation'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Navigation failed: ${response.status}`);
+    }
+
+    const html = await response.text();
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+
+    const incomingMain = parsed.querySelector('main.page-main');
+    const incomingFooter = parsed.querySelector('footer.footer');
+    const currentMain = document.querySelector('main.page-main');
+    const currentFooter = document.querySelector('footer.footer');
+
+    if (!incomingMain || !incomingFooter || !currentMain || !currentFooter) {
+      window.location.href = url;
       return;
     }
 
-    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-    const targetPath = href.split('#')[0].trim();
+    const applyDomSwap = () => {
+      currentMain.replaceWith(incomingMain);
+      currentFooter.replaceWith(incomingFooter);
 
-    if (currentPath === targetPath || isLeaving) {
-      event.preventDefault();
-      return;
+      document.title = parsed.title;
+
+      const nextPage = parsed.body.getAttribute('data-page');
+      if (nextPage) {
+        document.body.setAttribute('data-page', nextPage);
+      }
+
+      if (pushHistory) {
+        window.history.pushState({}, '', url);
+      }
+
+      if (resetScroll) {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      }
+
+      initPage(document);
+    };
+
+    if (document.startViewTransition) {
+      await document.startViewTransition(applyDomSwap).finished;
+    } else {
+      applyDomSwap();
     }
+  } catch (error) {
+    window.location.href = url;
+  } finally {
+    isNavigating = false;
+    document.body.classList.remove('is-routing');
+  }
+}
 
+document.addEventListener('click', (event) => {
+  const link = event.target.closest('a[data-nav-link="true"]');
+  if (!link) {
+    return;
+  }
+
+  if (link.target && link.target !== '_self') {
+    return;
+  }
+
+  const href = link.getAttribute('href');
+  if (!href || href.startsWith('#') || href.startsWith('mailto:')) {
+    return;
+  }
+
+  const targetUrl = new URL(href, window.location.href);
+  if (targetUrl.origin !== window.location.origin) {
+    return;
+  }
+
+  const currentUrl = new URL(window.location.href);
+  if (targetUrl.pathname === currentUrl.pathname && targetUrl.search === currentUrl.search) {
     event.preventDefault();
-    isLeaving = true;
-    document.body.classList.add('page-leave');
+    return;
+  }
 
-    setTimeout(() => {
-      window.location.href = href;
-    }, 580);
-  });
+  event.preventDefault();
+  navigateSeamlessly(targetUrl.href, { pushHistory: true, resetScroll: true });
 });
 
-const yearNode = document.getElementById('year');
-if (yearNode) {
-  yearNode.textContent = String(new Date().getFullYear());
-}
+window.addEventListener('popstate', () => {
+  navigateSeamlessly(window.location.href, { pushHistory: false, resetScroll: false });
+});
 
-const codingDaysNode = document.getElementById('codingDays');
-if (codingDaysNode) {
-  const startDate = new Date('2023-09-01T00:00:00');
-  const now = new Date();
-
-  const startUtc = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
-  const nowUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-
-  const days = Math.max(0, Math.floor((nowUtc - startUtc) / 86400000));
-  codingDaysNode.textContent = String(days);
-}
+initParallax();
+initPage(document);
