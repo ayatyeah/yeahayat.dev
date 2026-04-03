@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Минималистичный сайт Аята (YeahAyat)." />
+    <title>YeahAyat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="yeahayatdev_logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="home">
+    <div class="ya-bg" aria-hidden="true">
+      <p class="ya-track">YA YA YA YA YA YA YA YA YA YA YA YA</p>
+      <p class="ya-track ya-track-alt">YA YA YA YA YA YA YA YA YA YA YA YA</p>
+      <p class="ya-track ya-track-low">YA YA YA YA YA YA YA YA YA YA YA YA</p>
+    </div>
+
+    <div class="ya-transition" aria-hidden="true">
+      <span class="ya-mark">YA</span>
+    </div>
+
+    <header class="header reveal" id="top">
+      <a class="brand" href="index.html" data-nav-link="true">
+        <span>YeahAyat</span>
+        <span class="brand-mark-wrap">
+          <img class="brand-mark" src="yeahayat_logo_without name.png" alt="YeahAyat mark" />
+        </span>
+      </a>
+    </header>
+
+    <main class="page-main page-main-home">
+      <section class="hero hero-core reveal">
+        <div class="display-hub home-intro">
+          <img class="hero-mark" src="yeahayat_logo_without name.png" alt="YeahAyat mark" />
+          <h1 class="display-word">Ayat Balmagambet</h1>
+        </div>
+        <div class="quick-links">
+          <a class="btn btn-black" href="projects.html" data-nav-link="true">Проекты</a>
+          <a class="btn btn-white" href="contact.html" data-nav-link="true">Контакты</a>
+          <a class="btn btn-white" href="github.html" data-nav-link="true">GitHub</a>
+        </div>
+      </section>
+
+      <section class="about-home reveal" aria-label="Информация обо мне">
+        <h2>Обо мне</h2>
+        <p>
+          Я разработчик. Учусь на программиста и параллельно делаю свои проекты.
+        </p>
+        <p>
+          Работаю с backend'ом на Spring Boot: API, базы данных, логика
+          приложения. Параллельно делаю frontend, чтобы не зависеть от других и
+          понимать, как продукт работает целиком.
+        </p>
+        <p>
+          Делаю не "учебные задания", а проекты, которые можно запустить и
+          использовать.
+        </p>
+        <p>
+          Сейчас цель - выйти на стабильный доход через разработку и набрать
+          сильное портфолио.
+        </p>
+      </section>
+
+      <section class="coding-days reveal" aria-label="Сколько я программирую">
+        <p class="coding-days-title">Сколько я программирую</p>
+        <p class="coding-days-value"><span id="codingDays">0</span> дней</p>
+      </section>
+
+      <section class="skills-marquee reveal" aria-label="Что я умею">
+        <p class="skills-title">Что я умею</p>
+        <div class="skills-strip" role="presentation">
+          <div class="skill-chip" tabindex="0">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" alt="C++ logo" />
+            <span>C++</span>
+            <span class="skill-tip">Алгоритмы, ООП, структуры данных, pet-проекты.</span>
+          </div>
+          <div class="skill-chip" tabindex="0">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python logo" />
+            <span>Python</span>
+            <span class="skill-tip">Скрипты, автоматизация, backend-утилиты.</span>
+          </div>
+          <div class="skill-chip" tabindex="0">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript logo" />
+            <span>JavaScript</span>
+            <span class="skill-tip">Интерактивный UI, SPA, клиентская логика.</span>
+          </div>
+          <div class="skill-chip" tabindex="0">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" alt="Spring Boot logo" />
+            <span>SpringBoot</span>
+            <span class="skill-tip">REST API, JPA, бизнес-логика, архитектура.</span>
+          </div>
+          <div class="skill-chip" tabindex="0">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js logo" />
+            <span>Node.js</span>
+            <span class="skill-tip">Серверы, API, realtime-сервисы.</span>
+          </div>
+          <div class="skill-chip" tabindex="0">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React logo" />
+            <span>React</span>
+            <span class="skill-tip">Компонентная архитектура и современный frontend.</span>
+          </div>
+          <div class="skill-chip" tabindex="0">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg" alt="Go logo" />
+            <span>Go</span>
+            <span class="skill-tip">Базовый уровень, backend pet-проекты.</span>
+          </div>
+          <div class="skill-chip" tabindex="0">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java logo" />
+            <span>Java</span>
+            <span class="skill-tip">Core Java, backend и прикладная логика.</span>
+          </div>
+
+          <div class="skill-chip" tabindex="-1" aria-hidden="true">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" alt="" />
+            <span>C++</span>
+          </div>
+          <div class="skill-chip" tabindex="-1" aria-hidden="true">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="" />
+            <span>Python</span>
+          </div>
+          <div class="skill-chip" tabindex="-1" aria-hidden="true">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="" />
+            <span>JavaScript</span>
+          </div>
+          <div class="skill-chip" tabindex="-1" aria-hidden="true">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" alt="" />
+            <span>SpringBoot</span>
+          </div>
+          <div class="skill-chip" tabindex="-1" aria-hidden="true">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="" />
+            <span>Node.js</span>
+          </div>
+          <div class="skill-chip" tabindex="-1" aria-hidden="true">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="" />
+            <span>React</span>
+          </div>
+          <div class="skill-chip" tabindex="-1" aria-hidden="true">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg" alt="" />
+            <span>Go</span>
+          </div>
+          <div class="skill-chip" tabindex="-1" aria-hidden="true">
+            <img class="skill-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="" />
+            <span>Java</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer reveal">
+      <p>© <span id="year"></span> YeahAyat</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
