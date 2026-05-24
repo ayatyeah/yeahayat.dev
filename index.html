@@ -1,401 +1,131 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Endterm Prep: Advanced Programming 2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #050505;
-            color: #22c55e; /* Green-500 */
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .tab-active {
-            border-bottom: 2px solid #22c55e;
-            color: #4ade80;
-            background-color: rgba(34, 197, 94, 0.1);
-        }
-        .prose-green h1, .prose-green h2, .prose-green h3 { color: #4ade80; margin-top: 1.5rem; margin-bottom: 0.5rem; font-weight: bold; }
-        .prose-green h1 { font-size: 1.8rem; border-bottom: 1px solid #166534; padding-bottom: 0.5rem; }
-        .prose-green h2 { font-size: 1.5rem; }
-        .prose-green p { margin-bottom: 1rem; color: #d1fae5; line-height: 1.6; }
-        .prose-green ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; color: #d1fae5; }
-        .prose-green li { margin-bottom: 0.25rem; }
-        .prose-green strong { color: #4ade80; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #166534; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #22c55e; }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col">
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="YeahAyat - разработчик, который делает аккуратные веб-интерфейсы, backend и живые продукты."
+    />
+    <title>YeahAyat - Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="yeahayatdev_logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="home">
+    <canvas id="voidCanvas" class="void-canvas" aria-hidden="true"></canvas>
+    <div class="noise-layer" aria-hidden="true"></div>
+    <div class="scan-layer" aria-hidden="true"></div>
 
-    <header class="border-b border-green-900 bg-black p-6 shadow-md shadow-green-900/20">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold tracking-wider uppercase flex items-center gap-2">
-                <i class="fa-solid fa-terminal"></i> Endterm Prep HQ
-            </h1>
-            <div class="text-green-700 text-sm">Advanced Programming 2</div>
-        </div>
+    <div class="ya-transition" aria-hidden="true">
+      <span class="ya-mark">YA</span>
+      <span class="transition-line"></span>
+    </div>
+
+    <header class="header reveal" id="top">
+      <a class="brand magnetic" href="index.html" data-nav-link="true" aria-label="На главную">
+        <span class="brand-text">YeahAyat</span>
+        <span class="brand-mark-wrap">
+          <img class="brand-mark" src="yeahayat_logo_without name.png" alt="" />
+        </span>
+      </a>
+
+      <nav class="nav-links" aria-label="Основная навигация">
+        <a class="nav-link magnetic" href="projects.html" data-nav-link="true">Проекты</a>
+        <a class="nav-link magnetic" href="contact.html" data-nav-link="true">Контакты</a>
+        <a class="nav-link magnetic" href="github.html" data-nav-link="true">GitHub</a>
+      </nav>
     </header>
 
-    <main class="flex-grow max-w-5xl mx-auto w-full p-4 mt-4">
-        
-        <div class="flex flex-wrap border-b border-green-900 mb-6 gap-2">
-            <button onclick="switchTab('notes-en')" id="tab-notes-en" class="px-4 py-2 font-bold tab-active transition-colors hover:bg-green-900/30 rounded-t-md">Notes (A1-A2 EN)</button>
-            <button onclick="switchTab('notes-ru')" id="tab-notes-ru" class="px-4 py-2 font-bold text-green-700 transition-colors hover:bg-green-900/30 rounded-t-md">Notes (RU)</button>
-            <button onclick="switchTab('quiz')" id="tab-quiz" class="px-4 py-2 font-bold text-green-700 transition-colors hover:bg-green-900/30 rounded-t-md">Practice Quiz</button>
+    <main class="page-main page-main-home">
+      <section class="hero hero-core reveal" aria-label="YeahAyat">
+        <div class="display-hub home-intro">
+          <img class="hero-mark" src="yeahayat_logo_without name.png" alt="YeahAyat" />
+          <h1 class="display-word">Ayat Balmagambet</h1>
+          <p class="hero-copy">
+            Делаю сайты и приложения, которые выглядят живыми, быстро работают и не разваливаются под реальными задачами.
+            Люблю чистую логику, спокойные интерфейсы и проекты, где у каждой детали есть смысл.
+          </p>
         </div>
 
-        <div id="notes-en" class="tab-content block bg-gray-900/50 p-6 rounded-lg border border-green-900 prose-green">
-            <h1>1. Message Queues (MQ)</h1>
-            <p><strong>What is MQ?</strong> A Message Queue helps different parts of an app (services) talk to each other. They do not wait for an answer. One service sends a message, and another reads it later. This is called <em>Asynchronous</em> communication.</p>
-            <ul>
-                <li><strong>Decoupling:</strong> Services do not need to know about each other.</li>
-                <li><strong>Pub/Sub (Publish/Subscribe):</strong> One message goes to many listeners (consumers). Example: An order is created. Billing and Email services both read the message.</li>
-                <li><strong>Point-to-Point (P2P):</strong> One message goes to only ONE consumer. Good for tasks (like resizing an image).</li>
-            </ul>
-            <h2>Tools</h2>
-            <ul>
-                <li><strong>NATS:</strong> Very fast and simple. Uses "Subjects" (like a name for a message channel). <strong>JetStream</strong> is a part of NATS that saves messages so they are not lost if a server crashes (persistence).</li>
-                <li><strong>RabbitMQ:</strong> Uses "Exchanges" to route (direct) messages to "Queues". Very flexible.</li>
-                <li><strong>Kafka:</strong> Saves messages in a "log". Great for massive data and analytics.</li>
-            </ul>
-
-            <h1>2. Transactions & ACID</h1>
-            <p>A transaction is a group of database actions. They must all succeed, or all fail together.</p>
-            <ul>
-                <li><strong>A - Atomicity:</strong> All or nothing. (If step 2 fails, step 1 is canceled).</li>
-                <li><strong>C - Consistency:</strong> Data must be valid and follow rules.</li>
-                <li><strong>I - Isolation:</strong> Concurrent (same time) transactions do not break each other.</li>
-                <li><strong>D - Durability:</strong> If saved, it stays saved even if power goes off.</li>
-            </ul>
-            <p><strong>PostgreSQL:</strong> A SQL database. Very strong ACID rules. Uses <code>BEGIN</code>, <code>COMMIT</code>, and <code>ROLLBACK</code>.<br>
-            <strong>MongoDB:</strong> A NoSQL database. Added ACID transactions later to support complex workflows across multiple documents.</p>
-            <p><strong>2PC (Two-Phase Commit):</strong> Used when a transaction uses TWO different databases. Phase 1: Ask "Are you ready?". Phase 2: "Commit!". It is hard and slow.</p>
-
-            <h1>3. Caching Strategies</h1>
-            <p><strong>What is Caching?</strong> Saving frequently used data in fast memory (like <strong>Redis</strong>) so you do not ask the slow database every time.</p>
-            <ul>
-                <li><strong>Cache Hit:</strong> Data is in the cache. Very fast!</li>
-                <li><strong>Cache Miss:</strong> Data is not in the cache. App asks the database, then saves it to cache.</li>
-                <li><strong>TTL (Time To Live):</strong> How long data stays in cache before it deletes itself.</li>
-                <li><strong>Write-through:</strong> Save to DB and Cache at the exact same time.</li>
-                <li><strong>Write-back:</strong> Save to Cache first (fast), save to DB later. Risky if power goes off.</li>
-                <li><strong>Write-around:</strong> Save to DB only. Cache gets data only on the next read.</li>
-            </ul>
-
-            <h1>4. External Integrations & Background Jobs</h1>
-            <ul>
-                <li><strong>Idempotency:</strong> A very important concept! It means if you do the same action many times, the result is the same as doing it once. Example: "Set volume to 5" is idempotent. "Increase volume by 1" is NOT. We use <strong>Idempotency Keys</strong> so we don't charge a credit card twice if network fails!</li>
-                <li><strong>Webhooks:</strong> When an external app (like Stripe or GitHub) sends an HTTP POST request to <em>your</em> app to say "Something happened!". You must verify the signature.</li>
-                <li><strong>Retries:</strong> If a job fails, try again. Use <strong>Exponential Backoff</strong> (wait 1s, then 2s, then 4s) so you do not break the server.</li>
-            </ul>
-
-            <h1>5. Observability & Monitoring</h1>
-            <p>How do we know if our app is healthy?</p>
-            <ul>
-                <li><strong>Logs:</strong> Text messages about what happened (e.g., "User 123 logged in"). Use Structured Logging (JSON) in Go.</li>
-                <li><strong>Metrics:</strong> Numbers and stats over time. (e.g., CPU is at 80%, or 50 requests per second). Used for alerts.</li>
-                <li><strong>Traces:</strong> Follows ONE request across many microservices. Uses a Trace ID. Helps find which service is slow.</li>
-            </ul>
+        <div class="quick-links" aria-label="Быстрые ссылки">
+          <a class="btn btn-white magnetic" href="projects.html" data-nav-link="true">Смотреть проекты</a>
+          <a class="btn btn-dark magnetic" href="contact.html" data-nav-link="true">Связаться</a>
+          <a class="btn btn-white magnetic" href="github.html" data-nav-link="true">GitHub</a>
         </div>
 
-        <div id="notes-ru" class="tab-content hidden bg-gray-900/50 p-6 rounded-lg border border-green-900 prose-green">
-            <h1>1. Очереди сообщений (Message Queues)</h1>
-            <p><strong>Что это?</strong> MQ помогает разным частям приложения (микросервисам) общаться друг с другом. Они не ждут ответа. Один сервис отправляет сообщение, другой читает его позже. Это называется <em>Асинхронным</em> общением.</p>
-            <ul>
-                <li><strong>Слабая связность (Decoupling):</strong> Сервисам не нужно знать друг о друге.</li>
-                <li><strong>Pub/Sub (Издатель/Подписчик):</strong> Одно сообщение получают много слушателей. Пример: заказ создан, сервисы биллинга и email оба читают это сообщение.</li>
-                <li><strong>Point-to-Point (P2P):</strong> Одно сообщение идет только ОДНОМУ консьюмеру (обработчику). Отлично подходит для задач (например, изменение размера картинки).</li>
-            </ul>
-            <h2>Инструменты</h2>
-            <ul>
-                <li><strong>NATS:</strong> Очень быстрый и простой. Использует "Subjects" (темы сообщений). <strong>JetStream</strong> — это надстройка над NATS, которая сохраняет сообщения (persistence), чтобы они не потерялись при сбое сервера.</li>
-                <li><strong>RabbitMQ:</strong> Использует "Exchanges" (обменники) для маршрутизации сообщений в "Queues" (очереди).</li>
-                <li><strong>Kafka:</strong> Сохраняет сообщения в виде "лога" (журнала). Идеально для огромных объемов данных и аналитики.</li>
-            </ul>
+        <div class="scroll-signal" aria-hidden="true">
+          <span></span>
+        </div>
+      </section>
 
-            <h1>2. Транзакции и ACID</h1>
-            <p>Транзакция — это группа действий в БД. Они должны либо все выполниться успешно, либо все отмениться.</p>
-            <ul>
-                <li><strong>A - Atomicity (Атомарность):</strong> Всё или ничего. Если шаг 2 падает, шаг 1 отменяется.</li>
-                <li><strong>C - Consistency (Согласованность):</strong> Данные должны быть валидными и не нарушать правила БД.</li>
-                <li><strong>I - Isolation (Изолированность):</strong> Параллельные транзакции не мешают друг другу.</li>
-                <li><strong>D - Durability (Надежность):</strong> Если данные сохранены (commit), они не пропадут даже при отключении света.</li>
-            </ul>
-            <p><strong>PostgreSQL:</strong> SQL база данных. Строгие правила ACID (использует <code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code>).<br>
-            <strong>MongoDB:</strong> NoSQL база данных. Добавили поддержку ACID транзакций позже для сложных операций над несколькими документами.</p>
-            <p><strong>2PC (Two-Phase Commit):</strong> Используется для распределенных транзакций (в нескольких БД). Фаза 1: "Все готовы?". Фаза 2: "Сохраняем!". Это сложно и медленно.</p>
+      <section class="impact-grid reveal" aria-label="Профиль">
+        <article class="impact-panel panel-tall" data-tilt>
+          <p class="panel-label">обо мне</p>
+          <h2>Собираю идеи в работающие продукты: от интерфейса до серверной логики.</h2>
+          <p>
+            Пишу frontend и backend, продумываю структуру, API, данные, интеграции и пользовательские сценарии.
+            Мне важно, чтобы проект ощущался цельным: без лишней мишуры, с понятным движением и крепкой основой.
+          </p>
+        </article>
 
-            <h1>3. Стратегии кэширования (Caching)</h1>
-            <p><strong>Что это?</strong> Сохранение часто используемых данных в быстрой памяти (например, <strong>Redis</strong>), чтобы не дергать медленную БД каждый раз.</p>
-            <ul>
-                <li><strong>Cache Hit:</strong> Данные найдены в кэше. Очень быстро!</li>
-                <li><strong>Cache Miss:</strong> Данных нет в кэше. Приложение идет в БД, затем сохраняет ответ в кэш.</li>
-                <li><strong>TTL (Time To Live):</strong> Время жизни данных в кэше до их автоматического удаления.</li>
-                <li><strong>Write-through:</strong> Данные пишутся в БД и кэш одновременно.</li>
-                <li><strong>Write-back:</strong> Данные пишутся сначала в кэш (быстро), а потом асинхронно в БД. Риск потери данных при сбое.</li>
-                <li><strong>Write-around:</strong> Данные пишутся только в БД. Кэш обновляется только при следующем чтении.</li>
-            </ul>
+        <article class="impact-panel stat-panel" data-tilt>
+          <p class="panel-label">в коде</p>
+          <p class="stat-value"><span id="codingDays">0</span></p>
+          <p class="stat-caption">дней с первой серьёзной точки старта</p>
+        </article>
 
-            <h1>4. Внешние интеграции и Фоновые задачи</h1>
-            <ul>
-                <li><strong>Идемпотентность (Idempotency):</strong> Важнейший концепт! Это значит, что если выполнить действие много раз, результат будет таким же, как если выполнить его один раз. Это нужно, чтобы при сбое сети мы не сняли деньги с карты клиента дважды. Мы используем Idempotency Keys.</li>
-                <li><strong>Webhooks (Вебхуки):</strong> Когда внешнее приложение (например, Stripe) отправляет HTTP POST запрос <em>вашему</em> приложению, чтобы сказать "Что-то произошло!". Обязательно нужно проверять цифровую подпись (signature).</li>
-                <li><strong>Ретраи (Retries):</strong> Если задача упала, пробуем снова. Используем <strong>Exponential Backoff</strong> (ждем 1с, потом 2с, потом 4с), чтобы не положить сервер.</li>
-            </ul>
+        <article class="impact-panel" data-tilt>
+          <p class="panel-label">фокус</p>
+          <p>
+            Люблю задачи, где нужно соединить красоту и практичность: формы, личные кабинеты, музыкальные сервисы,
+            обучение, авторизацию, данные и нормальный UX без ощущения шаблона.
+          </p>
+        </article>
+      </section>
 
-            <h1>5. Наблюдаемость (Observability) и Мониторинг</h1>
-            <ul>
-                <li><strong>Логи (Logs):</strong> Текстовые сообщения о событиях (например, "Пользователь зашел"). В Go лучше использовать структурированные логи (JSON).</li>
-                <li><strong>Метрики (Metrics):</strong> Числа и статистика во времени (например, загрузка CPU 80% или 50 запросов в секунду). Нужны для алертов (Grafana/Prometheus).</li>
-                <li><strong>Трейсы (Traces):</strong> Отслеживание ОДНОГО запроса через все микросервисы. Используется Trace ID (OpenTelemetry). Помогает найти, какой именно сервис тормозит.</li>
-            </ul>
+      <section class="skills-marquee reveal" aria-label="Технологии">
+        <div class="section-head">
+          <p class="panel-label">стек</p>
+          <h2>Инструменты, с которыми я чаще всего собираю продукты.</h2>
         </div>
 
-        <div id="quiz" class="tab-content hidden bg-black p-6 rounded-lg border border-green-900 relative">
-            
-            <div id="quiz-setup" class="text-center py-10">
-                <i class="fa-solid fa-brain text-6xl text-green-700 mb-6 block"></i>
-                <h2 class="text-3xl font-bold mb-4 text-green-400">Knowledge Test</h2>
-                <p class="mb-8 text-green-600">Select number of questions to pull from the 50-question database.</p>
-                
-                <div class="flex items-center justify-center gap-4 mb-8">
-                    <label class="font-bold">Questions:</label>
-                    <input type="range" id="q-count" min="5" max="50" step="5" value="20" class="w-48 accent-green-500" oninput="document.getElementById('q-val').innerText = this.value">
-                    <span id="q-val" class="font-bold text-xl text-green-400 w-8">20</span>
-                </div>
-                
-                <button onclick="startQuiz()" class="bg-green-700 hover:bg-green-600 text-black font-bold py-3 px-8 rounded-md transition-colors border border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
-                    START SYSTEM HACK
-                </button>
-            </div>
-
-            <div id="quiz-active" class="hidden">
-                <div class="flex justify-between items-center mb-6 border-b border-green-900 pb-2">
-                    <div class="font-bold text-green-700">Question <span id="current-q-num" class="text-green-400">1</span> / <span id="total-q-num">10</span></div>
-                    <div class="font-bold text-green-700">Score: <span id="score-display" class="text-green-400">0</span></div>
-                </div>
-
-                <div id="question-text" class="text-xl font-bold mb-6 text-green-300 min-h-[60px]">
-                    Loading question...
-                </div>
-
-                <div id="options-container" class="space-y-3 mb-8">
-                    </div>
-
-                <div id="feedback-box" class="hidden p-4 rounded bg-gray-900 border mb-6 text-sm">
-                    </div>
-
-                <div class="flex justify-end">
-                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-green-900 hover:bg-green-800 text-green-300 border border-green-700 font-bold py-2 px-6 rounded-md transition-colors">
-                        Next Sequence <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div id="quiz-results" class="hidden text-center py-10">
-                <h2 class="text-4xl font-bold mb-4 text-green-400">Simulation Complete</h2>
-                <div class="text-6xl font-bold mb-6 text-green-600" id="final-score-percent">100%</div>
-                <p class="mb-8 text-xl">Final Score: <span id="final-score-raw"></span></p>
-                <button onclick="resetQuiz()" class="bg-transparent hover:bg-green-900/50 text-green-500 border border-green-500 font-bold py-2 px-6 rounded-md transition-colors">
-                    Reboot Module
-                </button>
-            </div>
+        <div class="skills-orbit">
+          <div class="skills-strip" role="presentation">
+            <span class="skill-chip">C++</span>
+            <span class="skill-chip">Python</span>
+            <span class="skill-chip">JavaScript</span>
+            <span class="skill-chip">Spring Boot</span>
+            <span class="skill-chip">Node.js</span>
+            <span class="skill-chip">React</span>
+            <span class="skill-chip">Go</span>
+            <span class="skill-chip">Java</span>
+            <span class="skill-chip">REST API</span>
+            <span class="skill-chip">UX</span>
+            <span class="skill-chip">C++</span>
+            <span class="skill-chip">Python</span>
+            <span class="skill-chip">JavaScript</span>
+            <span class="skill-chip">Spring Boot</span>
+            <span class="skill-chip">Node.js</span>
+            <span class="skill-chip">React</span>
+            <span class="skill-chip">Go</span>
+            <span class="skill-chip">Java</span>
+            <span class="skill-chip">REST API</span>
+            <span class="skill-chip">UX</span>
+          </div>
         </div>
+      </section>
     </main>
 
-    <footer class="text-center p-4 border-t border-green-900 mt-8 text-green-800 text-sm">
-        Advanced Programming 2 • Endterm Preparation Module
+    <footer class="footer reveal">
+      <p>© <span id="year"></span> YeahAyat</p>
     </footer>
 
-    <script>
-        // Database of 50 Questions based on provided lectures and links
-        const questionDB = [
-            // MQ & Event Driven
-            { q: "Which messaging pattern routes a single message to multiple consumers?", options: ["Point-to-Point", "Pub/Sub", "Request-Reply", "Client-Server"], a: 1, exp: "Pub/Sub (Publish/Subscribe) broadcasts messages to all interested consumers." },
-            { q: "In Point-to-Point messaging, what happens if multiple consumers listen to the same queue?", options: ["All consumers get a copy of the message", "The message is load-balanced (only one consumer gets it)", "The queue crashes", "The message is saved but not sent"], a: 1, exp: "In P2P, the broker load-balances the messages so each message is processed only once." },
-            { q: "What is the primary advantage of Event-Driven Architecture?", options: ["Tight coupling between services", "Synchronous blocking calls", "Loose coupling and high scalability", "Using less memory"], a: 2, exp: "EDA decouples services. Producers don't need to know who consumes the events." },
-            { q: "In NATS, what is used to route messages?", options: ["Exchanges", "Topics", "Subjects", "Partitions"], a: 2, exp: "NATS uses 'Subjects' (e.g., 'orders.created') for routing." },
-            { q: "What is NATS JetStream?", options: ["A GUI for NATS", "A built-in HTTP server", "A subsystem providing persistence and message replay", "A load balancer"], a: 2, exp: "JetStream adds persistence, delivery guarantees, and replay capabilities to core NATS." },
-            { q: "In RabbitMQ, what component routes messages to queues?", options: ["Producer", "Exchange", "Subject", "Zookeeper"], a: 1, exp: "Producers publish to an Exchange, which routes messages to Queues based on bindings." },
-            { q: "Which delivery guarantee ensures a message is not lost, but might be processed twice?", options: ["At-most-once", "At-least-once", "Exactly-once", "Never-once"], a: 1, exp: "At-least-once retries on failure, which can lead to duplicate processing." },
-            { q: "What is a 'Dead-Letter Queue' (DLQ)?", options: ["A queue that deletes old messages", "A queue for messages that fail processing multiple times", "A queue for low-priority tasks", "A completely empty queue"], a: 1, exp: "Poison messages that fail retries are parked in a DLQ for manual inspection." },
-            { q: "What happens in 'At-most-once' delivery?", options: ["Message is retried forever", "Message is processed exactly once", "Message might be lost, but never duplicated", "Message is saved in JetStream"], a: 2, exp: "Auto-ack without retries means it fires once. If it fails, it's lost, but no duplicates occur." },
-            { q: "Why shouldn't you make synchronous HTTP calls directly in the request path for slow external services?", options: ["It breaks REST principles", "It increases memory usage", "It cascades latency and ties up server resources", "HTTP is not secure"], a: 2, exp: "Waiting for external APIs makes your app slow. Use background jobs instead." },
-
-            // Transactions
-            { q: "What does the 'A' in ACID stand for?", options: ["Availability", "Atomicity", "Asynchronous", "Analytics"], a: 1, exp: "Atomicity ensures all operations in a transaction succeed, or none do." },
-            { q: "What does Isolation in ACID guarantee?", options: ["Data is saved to disk", "All steps pass or fail together", "Concurrent transactions do not corrupt each other's data", "Data follows schema rules"], a: 2, exp: "Isolation prevents parallel transactions from reading incomplete states of each other." },
-            { q: "Which database is known as a relational SQL database with strong ACID compliance?", options: ["MongoDB", "Redis", "PostgreSQL", "NATS"], a: 2, exp: "PostgreSQL is a classic relational database with robust ACID transactions." },
-            { q: "Does MongoDB support ACID transactions?", options: ["No, it is NoSQL", "Yes, it supports multi-document ACID transactions", "Only for single documents", "Only in the enterprise paid version"], a: 1, exp: "MongoDB added multi-document ACID transactions in version 4.0." },
-            { q: "What is 2PC (Two-Phase Commit)?", options: ["A protocol for distributed transactions across multiple databases", "A Git command", "A caching strategy", "A logging framework"], a: 0, exp: "2PC uses a coordinator to ensure multiple databases commit or rollback together." },
-            { q: "What is a major downside of Two-Phase Commit (2PC)?", options: ["It is too fast", "It lacks atomicity", "It causes blocking and operational fragility", "It only works with MongoDB"], a: 2, exp: "If the coordinator fails during 2PC, databases can be left locked and blocking." },
-            { q: "Optimistic Locking assumes that...", options: ["Conflicts are frequent", "Conflicts are rare, so it checks versions on write", "The database is always up", "Records must be locked during SELECT"], a: 1, exp: "Optimistic locking doesn't lock rows immediately; it uses a version or timestamp to detect conflicts." },
-            { q: "Pessimistic Locking usually uses which SQL statement?", options: ["SELECT ... FOR UPDATE", "UPDATE ... OPTIMIZE", "LOCK ALL TABLES", "COMMIT"], a: 0, exp: "FOR UPDATE locks the rows until the transaction ends, preventing others from modifying them." },
-            { q: "When managing Database Migrations, what is a best practice?", options: ["Apply large breaking changes at once", "Edit tables directly in production GUI", "Keep migration files deterministic, ordered, and small", "Only write rollback scripts"], a: 2, exp: "Version-controlled, small, ordered migrations prevent schema drift." },
-            { q: "What is a major risk of a long-running database transaction?", options: ["It uses too much CPU", "It holds locks and can cause deadlocks or slow the system", "It automatically deletes data", "It disables the cache"], a: 1, exp: "Long transactions hold row locks, blocking other requests and degrading throughput." },
-
-            // Caching
-            { q: "What is a 'Cache Miss'?", options: ["The cache is full", "The requested data is found in the cache", "The requested data is not in the cache", "The cache server crashed"], a: 2, exp: "A miss means the app must fetch the data from the primary database." },
-            { q: "What is the 'Cache-aside' pattern?", options: ["App reads from DB first, then deletes cache", "App checks cache; if miss, reads DB and saves to cache", "Cache automatically polls DB for updates", "App writes to cache, cache writes to DB"], a: 1, exp: "In Cache-aside, the application logic is responsible for orchestrating the cache check and DB fallback." },
-            { q: "Which caching strategy writes data to the cache AND the database simultaneously?", options: ["Write-behind", "Write-around", "Write-through", "Cache-aside"], a: 2, exp: "Write-through ensures cache and DB are always strictly consistent, though writes are slightly slower." },
-            { q: "What does TTL mean in caching?", options: ["Total Time Latency", "Time To Live", "Transaction Timeout Limit", "Temporary Table Lock"], a: 1, exp: "Time To Live sets an expiration date on a cache key to prevent infinite stale data." },
-            { q: "What is a 'Cache Stampede'?", options: ["When Redis runs out of memory", "When a hot key expires and many concurrent requests hit the DB at once", "When too many keys are written", "When the cache returns stale data"], a: 1, exp: "A stampede overwhelms the DB because all threads miss the cache simultaneously." },
-            { q: "What is Redis primarily used for?", options: ["Long-term document storage", "Relational querying", "In-memory caching and data structures", "Message queueing only"], a: 2, exp: "Redis is an incredibly fast in-memory key-value store, perfect for caching." },
-            { q: "In the Write-Back caching strategy...", options: ["Data is written only to DB", "Data is written to cache first, and asynchronously to DB later", "Data is never written to DB", "Data is written to DB first, then cache"], a: 1, exp: "Write-back is fast for writes but risks data loss if the cache crashes before syncing to DB." },
-            { q: "Which eviction policy is commonly used when a cache gets full?", options: ["FIFO", "LIFO", "LRU (Least Recently Used)", "Random"], a: 2, exp: "LRU evicts data that hasn't been accessed in a long time." },
-            { q: "Why use Distributed Caching (like a Redis cluster)?", options: ["To scale cache capacity and handle more throughput across multiple nodes", "To replace PostgreSQL", "To write frontend code", "To slow down read queries"], a: 0, exp: "Distributed caching pools memory from multiple servers to handle massive scale." },
-            { q: "What happens in a 'Fixed Window' rate limiter?", options: ["Tokens drip continuously", "Requests are counted in distinct time blocks (e.g., 00:00 to 00:01)", "Requests are never rejected", "It only limits IP addresses"], a: 1, exp: "Fixed window counts requests per minute/hour block. It can suffer from boundary spikes." },
-
-            // External & Jobs
-            { q: "What does 'Idempotency' mean in software engineering?", options: ["Running a function twice causes a crash", "An operation can be applied multiple times without changing the result beyond the initial application", "A database that is immutable", "A function that has no side effects"], a: 1, exp: "Idempotency makes retries safe. 'Set status=PAID' is idempotent. 'Add $10' is not." },
-            { q: "What is a Webhook?", options: ["A tool for web scraping", "A user-defined HTTP callback triggered by an event in an external system", "A caching strategy", "A database index"], a: 1, exp: "Webhooks allow external services (like Stripe/GitHub) to push data to your server via HTTP POST." },
-            { q: "Why must you verify a Webhook signature?", options: ["To compress the payload", "To route the message to the correct queue", "To prove the webhook came from the trusted provider and not an attacker", "To automatically convert JSON to Go structs"], a: 2, exp: "Anyone can send a POST request. The HMAC signature proves authenticity." },
-            { q: "When implementing background jobs, what is 'Exponential Backoff'?", options: ["Multiplying the payload size by 2", "Increasing the delay time between retry attempts (e.g., 1s, 2s, 4s)", "Deleting jobs after 2 attempts", "Sending the job to multiple workers"], a: 1, exp: "Exponential backoff prevents hammering a struggling service with immediate retries." },
-            { q: "Where should third-party API SDK calls be placed in Clean Architecture?", options: ["Directly in the HTTP handler", "Deep inside core business logic", "In external adapter interfaces at the boundary", "In the database schema"], a: 2, exp: "External APIs are infrastructure. Keep them behind adapters to keep domain logic pure and testable." },
-            { q: "How do you achieve an 'Exactly-once effect' in a distributed system?", options: ["Using a magically perfect network", "At-least-once delivery combined with idempotent consumers", "At-most-once delivery", "By using only synchronous HTTP"], a: 1, exp: "Since networks fail, we rely on retries (at-least-once) but use deduplication (idempotency) to only apply the effect once." },
-            { q: "If a worker crashes AFTER sending an email but BEFORE sending the ACK to RabbitMQ, what happens?", options: ["The message is deleted permanently", "The email is un-sent", "RabbitMQ redelivers the message, causing a duplicate email if not handled", "The worker is banned"], a: 2, exp: "Without an ACK, the broker assumes failure and redelivers. This is why handlers must be idempotent." },
-            { q: "What is the purpose of an 'Idempotency Key'?", options: ["To encrypt data", "To uniquely identify a request so the server knows if it has already processed it", "To log in to the database", "To speed up caching"], a: 1, exp: "Stripe and other APIs use Idempotency Keys to safely retry payments without double-charging." },
-            { q: "When a webhook is received, what is the best practice?", options: ["Do all heavy processing synchronously and return 200 OK after 5 minutes", "Verify signature, save event, enqueue a job, and return 200 OK quickly", "Return 500 error to test their retries", "Redirect the webhook to a database"], a: 1, exp: "Webhooks require fast ACKs (usually <3s). Offload heavy work to a message queue." },
-            { q: "What constitutes a 'Transient Error'?", options: ["Invalid email format", "Missing required JSON fields", "Temporary rate limit (HTTP 429) or network timeout", "A deleted user account"], a: 2, exp: "Transient errors are temporary. They are safe to retry. Permanent errors (bad data) should not be retried." },
-
-            // Observability & Testing
-            { q: "What is the primary difference between Logs and Metrics?", options: ["Logs are text events; Metrics are aggregated numerical stats over time", "Metrics are for debugging; Logs are for dashboards", "Logs use OpenTelemetry; Metrics use JSON", "There is no difference"], a: 0, exp: "Logs tell you *what* happened (events). Metrics tell you *how much* (CPU usage, request count)." },
-            { q: "What is Distributed Tracing used for?", options: ["Backing up databases", "Tracing a single request's journey across multiple microservices", "Writing unit tests", "Generating SQL migrations"], a: 1, exp: "Traces use a shared Trace ID to show the timeline of a request as it jumps between APIs and Queues." },
-            { q: "In Golang testing, what is the 'Table-Driven' test pattern?", options: ["Testing SQL tables", "Using an array of structs containing inputs and expected outputs to run multiple scenarios through one test function", "Printing results in an ASCII table", "Testing HTML tables"], a: 1, exp: "Table-driven tests are the standard Go way to test multiple validation/branching rules cleanly." },
-            { q: "What is the purpose of the 'Testify' package in Go?", options: ["To mock HTTP servers", "To provide assertion functions (like require.Equal) and Mocking tools", "To compile Go code faster", "To write log files"], a: 1, exp: "Testify provides require/assert packages to make test files cleaner and readable." },
-            { q: "When writing Unit Tests, what should you MOCK?", options: ["Internal helper functions", "The actual business logic being tested", "External dependencies like Repositories and APIs", "The Go standard library"], a: 2, exp: "Mocks simulate boundaries (DBs, APIs) so you can test the pure business logic in isolation." },
-            { q: "What does an End-to-End (E2E) test evaluate?", options: ["A single function", "The entire system stack, mimicking real user behavior", "Only the database schema", "Only the Redis cache hit ratio"], a: 1, exp: "E2E tests spin up real databases and services to test critical user flows (e.g., Register -> Buy)." },
-            { q: "What command runs a Benchmark test in Go?", options: ["go test -bench .", "go run main.go", "go build", "go test -e2e"], a: 0, exp: "go test -bench runs benchmark functions (starting with BenchmarkX) to measure ns/op and allocations." },
-            { q: "Why is 'Structured Logging' preferred in modern systems?", options: ["It writes to XML", "It outputs logs as JSON, making them easily searchable by tools like ElasticSearch", "It uses less disk space", "It prevents deadlocks"], a: 1, exp: "JSON logs can be parsed by machines, allowing you to filter by user_id or error_code." },
-            { q: "What does OpenTelemetry provide?", options: ["A new programming language", "A standardized framework for generating and capturing Traces, Metrics, and Logs", "A message queue broker", "A caching server"], a: 1, exp: "OpenTelemetry (OTel) is the industry standard for instrumenting observability." },
-            { q: "If your app has high CPU usage, which observability signal do you check first?", options: ["Traces", "Logs", "Metrics", "Database schema"], a: 2, exp: "Metrics (like Prometheus/Grafana graphs) give you a high-level view of system resources like CPU and memory." }
-        ];
-
-        let activeQuestions = [];
-        let currentIdx = 0;
-        let score = 0;
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
-            
-            document.querySelectorAll('button[id^="tab-"]').forEach(el => {
-                el.classList.remove('tab-active', 'text-green-400');
-                el.classList.add('text-green-700');
-            });
-            let activeTabBtn = document.getElementById('tab-' + tabId);
-            activeTabBtn.classList.remove('text-green-700');
-            activeTabBtn.classList.add('tab-active', 'text-green-400');
-        }
-
-        function shuffle(array) {
-            let currentIndex = array.length, randomIndex;
-            while (currentIndex != 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-            }
-            return array;
-        }
-
-        function startQuiz() {
-            let numQuestions = parseInt(document.getElementById('q-count').value);
-            activeQuestions = shuffle([...questionDB]).slice(0, numQuestions);
-            currentIdx = 0;
-            score = 0;
-            
-            document.getElementById('quiz-setup').classList.add('hidden');
-            document.getElementById('quiz-results').classList.add('hidden');
-            document.getElementById('quiz-active').classList.remove('hidden');
-            document.getElementById('total-q-num').innerText = numQuestions;
-            document.getElementById('score-display').innerText = '0';
-            
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            document.getElementById('next-btn').classList.add('hidden');
-            document.getElementById('feedback-box').classList.add('hidden');
-            document.getElementById('current-q-num').innerText = currentIdx + 1;
-            
-            let qData = activeQuestions[currentIdx];
-            document.getElementById('question-text').innerText = qData.q;
-            
-            let optsHtml = '';
-            qData.options.forEach((opt, idx) => {
-                optsHtml += `
-                    <button id="opt-${idx}" onclick="selectAnswer(${idx})" class="w-full text-left p-4 rounded bg-green-900/20 border border-green-800 hover:bg-green-900/40 transition-colors">
-                        <span class="font-bold mr-2 text-green-500">${String.fromCharCode(65+idx)}.</span> ${opt}
-                    </button>
-                `;
-            });
-            document.getElementById('options-container').innerHTML = optsHtml;
-        }
-
-        function selectAnswer(idx) {
-            // Disable all buttons
-            let qData = activeQuestions[currentIdx];
-            let isCorrect = (idx === qData.a);
-            
-            for(let i=0; i<4; i++) {
-                let btn = document.getElementById('opt-'+i);
-                btn.disabled = true;
-                btn.classList.remove('hover:bg-green-900/40');
-                
-                if(i === qData.a) {
-                    btn.classList.add('bg-green-600', 'text-black', 'border-green-400');
-                    btn.classList.remove('bg-green-900/20');
-                } else if (i === idx && !isCorrect) {
-                    btn.classList.add('bg-red-900', 'border-red-500', 'text-red-200');
-                    btn.classList.remove('bg-green-900/20');
-                }
-            }
-            
-            if(isCorrect) {
-                score++;
-                document.getElementById('score-display').innerText = score;
-            }
-            
-            let feedback = document.getElementById('feedback-box');
-            feedback.innerHTML = `<strong>${isCorrect ? 'ACCESS GRANTED' : 'ACCESS DENIED'}:</strong> ${qData.exp}`;
-            feedback.className = `p-4 rounded border mb-6 text-sm ${isCorrect ? 'bg-green-900/40 border-green-500 text-green-300' : 'bg-red-900/40 border-red-500 text-red-200'}`;
-            feedback.classList.remove('hidden');
-            
-            document.getElementById('next-btn').classList.remove('hidden');
-        }
-
-        function nextQuestion() {
-            currentIdx++;
-            if (currentIdx < activeQuestions.length) {
-                loadQuestion();
-            } else {
-                showResults();
-            }
-        }
-
-        function showResults() {
-            document.getElementById('quiz-active').classList.add('hidden');
-            document.getElementById('quiz-results').classList.remove('hidden');
-            
-            let percent = Math.round((score / activeQuestions.length) * 100);
-            document.getElementById('final-score-percent').innerText = percent + '%';
-            document.getElementById('final-score-raw').innerText = `${score} / ${activeQuestions.length}`;
-            
-            let colorClass = percent >= 70 ? 'text-green-500' : 'text-red-500';
-            document.getElementById('final-score-percent').className = `text-6xl font-bold mb-6 ${colorClass}`;
-        }
-
-        function resetQuiz() {
-            document.getElementById('quiz-results').classList.add('hidden');
-            document.getElementById('quiz-setup').classList.remove('hidden');
-        }
-    </script>
-</body>
+    <script type="module" src="script.js"></script>
+  </body>
 </html>

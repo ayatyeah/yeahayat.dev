@@ -3,35 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Проекты Аята (YeahAyat)." />
-    <title>YeahAyat • Projects</title>
+    <meta name="description" content="Проекты YeahAyat: живые веб-продукты, приложения и сервисы." />
+    <title>YeahAyat - Проекты</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <link rel="icon" type="image/png" href="yeahayatdev_logo.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body data-page="projects">
-    <div class="ya-bg" aria-hidden="true">
-      <p class="ya-track">YA YA YA YA YA YA YA YA YA YA YA YA</p>
-      <p class="ya-track ya-track-alt">YA YA YA YA YA YA YA YA YA YA YA YA</p>
-      <p class="ya-track ya-track-low">YA YA YA YA YA YA YA YA YA YA YA YA</p>
-    </div>
+    <canvas id="voidCanvas" class="void-canvas" aria-hidden="true"></canvas>
+    <div class="noise-layer" aria-hidden="true"></div>
+    <div class="scan-layer" aria-hidden="true"></div>
 
     <div class="ya-transition" aria-hidden="true">
       <span class="ya-mark">YA</span>
+      <span class="transition-line"></span>
     </div>
 
     <header class="header reveal" id="top">
-      <a class="brand" href="index.html" data-nav-link="true">
-        <span>YeahAyat</span>
+      <a class="brand magnetic" href="index.html" data-nav-link="true" aria-label="На главную">
+        <span class="brand-text">YeahAyat</span>
         <span class="brand-mark-wrap">
-          <img class="brand-mark" src="yeahayat_logo_without name.png" alt="YeahAyat mark" />
+          <img class="brand-mark" src="yeahayat_logo_without name.png" alt="" />
         </span>
       </a>
+
+      <nav class="nav-links" aria-label="Основная навигация">
+        <a class="nav-link magnetic" href="index.html" data-nav-link="true">Главная</a>
+        <a class="nav-link magnetic" href="contact.html" data-nav-link="true">Контакты</a>
+        <a class="nav-link magnetic" href="github.html" data-nav-link="true">GitHub</a>
+      </nav>
     </header>
 
     <main class="page-main">
@@ -41,38 +46,32 @@
 
       <section class="projects reveal" id="projects">
         <div class="project-grid">
-          <article class="project-card">
-            <h3>BLC Soft Sale</h3>
-            <div class="project-link-wrap">
-              <a
-                class="project-link"
-                href="https://blcsoftsale.kz"
-                target="_blank"
-                rel="noreferrer"
-              >
-                blcsoftsale.kz
-              </a>
-            </div>
+          <article class="project-card project-card-featured" data-tilt>
+            <p class="panel-label">музыка</p>
+            <h2>YeahMusic</h2>
+            <p>Музыкальный веб-сервис с живым интерфейсом, личной атмосферой и быстрым доступом к трекам.</p>
+            <a class="project-link magnetic" href="https://yeahmusic.tech" target="_blank" rel="noreferrer">
+              yeahmusic.tech
+            </a>
           </article>
 
-          <article class="project-card">
-            <h3>YeahMusic</h3>
-            <div class="project-link-wrap">
-              <a
-                class="project-link"
-                href="https://yeahmusic-cd6lv.ondigitalocean.app"
-                target="_blank"
-                rel="noreferrer"
-              >
-                https://yeahmusic-cd6lv.ondigitalocean.app
-              </a>
-            </div>
+          <article class="project-card" data-tilt>
+            <p class="panel-label">обучение</p>
+            <h2>StudyLoop</h2>
+            <p>Платформа для учёбы, где материалы и прогресс собраны в понятный спокойный поток.</p>
+            <a class="project-link magnetic" href="https://studyloop.tech" target="_blank" rel="noreferrer">
+              studyloop.tech
+            </a>
           </article>
-        </div>
-        <div class="quick-links">
-          <a class="btn btn-white" href="index.html" data-nav-link="true">Главная</a>
-          <a class="btn btn-white" href="contact.html" data-nav-link="true">Контакты</a>
-          <a class="btn btn-white" href="github.html" data-nav-link="true">GitHub</a>
+
+          <article class="project-card" data-tilt>
+            <p class="panel-label">продажи</p>
+            <h2>BLC Soft Sale</h2>
+            <p>Рабочий сайт для продажи софта: продукты, подача, заявки и коммерческая структура без лишней путаницы.</p>
+            <a class="project-link magnetic" href="https://blcsoftsale.kz" target="_blank" rel="noreferrer">
+              blcsoftsale.kz
+            </a>
+          </article>
         </div>
       </section>
     </main>
@@ -81,6 +80,6 @@
       <p>© <span id="year"></span> YeahAyat</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
   </body>
 </html>
