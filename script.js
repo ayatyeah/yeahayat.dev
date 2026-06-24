@@ -115,6 +115,100 @@ function initTilt(root = document) {
   });
 }
 
+const TELEGRAM = {
+  // Временные данные. Токен бота виден в клиентском коде —
+  // для приватного/боевого использования заявки лучше слать через свой бэкенд/прокси.
+  token: '8775317758:AAFHwRqXh8O0cNatClLrMztJmWurWmgmjJI',
+  chatId: '-5444442493'
+};
+
+function initContactForm(root = document) {
+  const form = root.querySelector('#contactForm');
+  if (!form || form.dataset.formReady) {
+    return;
+  }
+
+  form.dataset.formReady = 'true';
+
+  const statusNode = form.querySelector('#formStatus');
+  const submitText = form.querySelector('.form-submit-text');
+  const defaultLabel = submitText ? submitText.textContent : 'Отправить';
+
+  const setStatus = (text, tone) => {
+    if (!statusNode) {
+      return;
+    }
+    statusNode.textContent = text;
+    statusNode.dataset.tone = tone || '';
+  };
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (form.dataset.sending === 'true') {
+      return;
+    }
+
+    const data = new FormData(form);
+    const name = String(data.get('name') || '').trim();
+    const contact = String(data.get('contact') || '').trim();
+    const message = String(data.get('message') || '').trim();
+
+    if (!name || !contact || !message) {
+      setStatus('Заполни все поля — так я смогу ответить.', 'error');
+      form.classList.remove('form-shake');
+      void form.offsetWidth;
+      form.classList.add('form-shake');
+      return;
+    }
+
+    form.dataset.sending = 'true';
+    form.classList.add('is-sending');
+    if (submitText) {
+      submitText.textContent = 'Отправляю…';
+    }
+    setStatus('Отправляю заявку…', 'pending');
+
+    const text =
+      '🚀 Новая заявка с yeahayat.dev\n\n' +
+      `👤 Имя: ${name}\n` +
+      `📡 Контакт: ${contact}\n` +
+      `💬 Сообщение:\n${message}`;
+
+    try {
+      const response = await fetch(`https://api.telegram.org/bot${TELEGRAM.token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM.chatId,
+          text,
+          disable_web_page_preview: true
+        })
+      });
+
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.description || `HTTP ${response.status}`);
+      }
+
+      form.reset();
+      setStatus('Готово! Заявка ушла — отвечу в ближайшее время.', 'success');
+      form.classList.remove('form-pop');
+      void form.offsetWidth;
+      form.classList.add('form-pop');
+    } catch (error) {
+      setStatus('Не получилось отправить. Напиши напрямую в Telegram @yeahayat.', 'error');
+    } finally {
+      form.dataset.sending = 'false';
+      form.classList.remove('is-sending');
+      if (submitText) {
+        submitText.textContent = defaultLabel;
+      }
+    }
+  });
+}
+
 function createParticleTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 64;
@@ -249,7 +343,7 @@ function initVoidScene() {
   torusB.rotation.x = Math.PI / 2.8;
   coreGroup.add(torusA, torusB);
 
-  const logoTexture = new THREE.TextureLoader().load('yeahayat_logo_without name.png');
+  const logoTexture = new THREE.TextureLoader().load('logo_clean.png');
   logoTexture.colorSpace = THREE.SRGBColorSpace;
   const logoMaterial = new THREE.MeshBasicMaterial({
     map: logoTexture,
@@ -378,12 +472,56 @@ function initVoidScene() {
   tick();
 }
 
+function initCursorAura() {
+  const aura = document.querySelector('.cursor-aura');
+  if (!aura || aura.dataset.ready) {
+    return;
+  }
+
+  aura.dataset.ready = 'true';
+
+  const target = { x: window.innerWidth / 2, y: window.innerHeight * 0.3 };
+  const current = { x: target.x, y: target.y };
+  let live = false;
+
+  window.addEventListener(
+    'pointermove',
+    (event) => {
+      target.x = event.clientX;
+      target.y = event.clientY;
+      if (!live) {
+        live = true;
+        aura.classList.add('is-live');
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener('pointerdown', () => {
+    aura.style.setProperty('--aura-scale', '1.18');
+  });
+  window.addEventListener('pointerup', () => {
+    aura.style.setProperty('--aura-scale', '1');
+  });
+
+  function follow() {
+    current.x += (target.x - current.x) * 0.12;
+    current.y += (target.y - current.y) * 0.12;
+    aura.style.setProperty('--aura-x', `${current.x}px`);
+    aura.style.setProperty('--aura-y', `${current.y}px`);
+    requestAnimationFrame(follow);
+  }
+
+  follow();
+}
+
 function initPage(root = document) {
   initReveal(root);
   initYear();
   initCodingDays();
   initMagnetic(root);
   initTilt(root);
+  initContactForm(root);
 }
 
 let isNavigating = false;
@@ -502,4 +640,5 @@ document.body.classList.add('page-enter');
 window.setTimeout(() => document.body.classList.remove('page-enter'), 850);
 
 initVoidScene();
+initCursorAura();
 initPage(document);
