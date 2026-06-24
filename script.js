@@ -115,11 +115,12 @@ function initTilt(root = document) {
   });
 }
 
+// Секреты подгружаются из config.js (window.__APP_CONFIG__), который генерится
+// из .env и НЕ коммитится в репозиторий. См. gen-config.mjs.
+const APP_CONFIG = (typeof window !== 'undefined' && window.__APP_CONFIG__) || {};
 const TELEGRAM = {
-  // Временные данные. Токен бота виден в клиентском коде —
-  // для приватного/боевого использования заявки лучше слать через свой бэкенд/прокси.
-  token: '8775317758:AAFHwRqXh8O0cNatClLrMztJmWurWmgmjJI',
-  chatId: '-5444442493'
+  token: (APP_CONFIG.telegram && APP_CONFIG.telegram.token) || '',
+  chatId: (APP_CONFIG.telegram && APP_CONFIG.telegram.chatId) || ''
 };
 
 function initContactForm(root = document) {
@@ -159,6 +160,11 @@ function initContactForm(root = document) {
       form.classList.remove('form-shake');
       void form.offsetWidth;
       form.classList.add('form-shake');
+      return;
+    }
+
+    if (!TELEGRAM.token || !TELEGRAM.chatId) {
+      setStatus('Форма не настроена. Напиши напрямую в Telegram @yeahayat.', 'error');
       return;
     }
 
