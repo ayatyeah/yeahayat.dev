@@ -7,7 +7,7 @@ export default function Privacy() {
   return (
     <main className="page-main">
       <section className="page-head reveal">
-        <h1 className="page-title">Политика конфиденциальности</h1>
+        <h1 className="page-title page-title-sm">Политика конфиденциальности</h1>
       </section>
 
       <section className="policy reveal">

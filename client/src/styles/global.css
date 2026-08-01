@@ -307,8 +307,10 @@ a {
 .display-word {
   position: relative;
   margin: 0;
-  max-width: 10ch;
-  font-size: clamp(3.2rem, 7.2vw, 6.4rem);
+  max-width: 100%;
+  /* размер подобран так, чтобы «BALMAGAMBET» (11 букв) влезал целиком
+     и на десктопе, и на узких экранах */
+  font-size: clamp(2.4rem, 7vw, 6rem);
   line-height: 0.88;
   font-weight: 700;
   letter-spacing: 0;
@@ -364,29 +366,6 @@ a {
 .btn-dark {
   color: #f4f7ff;
   background: rgba(16, 21, 43, 0.92);
-}
-
-.scroll-signal {
-  position: absolute;
-  bottom: 4vh;
-  left: 50%;
-  width: 28px;
-  height: 48px;
-  border: 1px solid rgba(16, 21, 43, 0.3);
-  border-radius: 999px;
-  transform: translateX(-50%);
-}
-
-.scroll-signal span {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  width: 4px;
-  height: 10px;
-  background: var(--acid);
-  border-radius: 999px;
-  transform: translateX(-50%);
-  animation: scrollDot 1.4s ease-in-out infinite;
 }
 
 .impact-grid {
@@ -516,6 +495,13 @@ a {
   text-shadow:
     0 0 34px rgba(59, 91, 219, 0.16),
     0 0 90px rgba(112, 72, 232, 0.10);
+}
+
+/* Для длинных заголовков («Политика конфиденциальности» — 18 букв в слове):
+   обычный page-title до 12rem не влезает по ширине */
+.page-title-sm {
+  font-size: clamp(1.6rem, 5.2vw, 5.4rem);
+  line-height: 0.95;
 }
 
 .projects {
@@ -1102,12 +1088,6 @@ body.is-routing a[data-nav-link="true"] {
   50% { opacity: 1; transform: scaleX(1); }
 }
 
-@keyframes scrollDot {
-  0% { opacity: 0; transform: translate(-50%, 0); }
-  35% { opacity: 1; }
-  100% { opacity: 0; transform: translate(-50%, 18px); }
-}
-
 @keyframes skillsTicker {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -1253,9 +1233,6 @@ body.is-routing a[data-nav-link="true"] {
     flex: 1 1 100%;
   }
 
-  .scroll-signal {
-    display: none;
-  }
 
   .impact-panel {
     min-height: 220px;
@@ -1267,6 +1244,10 @@ body.is-routing a[data-nav-link="true"] {
 
   .page-title {
     font-size: clamp(2.65rem, 14vw, 3.35rem);
+  }
+
+  .page-title-sm {
+    font-size: clamp(1.35rem, 7vw, 2rem);
   }
 
   .project-card {
