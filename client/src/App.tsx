@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import GitHubPage from './pages/GitHubPage';
+import Privacy from './pages/Privacy';
 import { TransitionProvider } from './lib/transition';
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/github" element={<GitHubPage />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

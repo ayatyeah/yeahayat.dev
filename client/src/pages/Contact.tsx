@@ -9,6 +9,7 @@ type Tone = '' | 'pending' | 'success' | 'error';
 export default function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
   const [sending, setSending] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<{ text: string; tone: Tone }>({ text: '', tone: '' });
   const [fx, setFx] = useState('');
 
@@ -35,6 +36,12 @@ export default function Contact() {
       return;
     }
 
+    if (!consent) {
+      setStatus({ text: 'Отметь согласие с политикой конфиденциальности.', tone: 'error' });
+      flash('form-shake');
+      return;
+    }
+
     setSending(true);
     setStatus({ text: 'Отправляю заявку…', tone: 'pending' });
 
@@ -42,7 +49,7 @@ export default function Contact() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, contact, message })
+        body: JSON.stringify({ name, contact, message, consent })
       });
       const payload = await response.json().catch(() => ({}));
 
@@ -51,6 +58,7 @@ export default function Contact() {
       }
 
       form.reset();
+      setConsent(false);
       setStatus({ text: 'Готово! Заявка ушла — отвечу в ближайшее время.', tone: 'success' });
       flash('form-pop');
     } catch (error) {
@@ -132,6 +140,25 @@ export default function Contact() {
               placeholder="О чём проект, сроки, бюджет, ссылки…"
               required
             ></textarea>
+          </label>
+
+          <label className="form-consent">
+            <input
+              className="form-consent-box"
+              type="checkbox"
+              name="consent"
+              checked={consent}
+              onChange={(event) => setConsent(event.target.checked)}
+              required
+            />
+            <span className="form-consent-mark" aria-hidden="true" />
+            <span className="form-consent-text">
+              Соглашаюсь с{' '}
+              <TransitionLink className="form-consent-link" to="/privacy">
+                политикой конфиденциальности
+              </TransitionLink>{' '}
+              и обработкой персональных данных
+            </span>
           </label>
 
           <div className="form-foot">

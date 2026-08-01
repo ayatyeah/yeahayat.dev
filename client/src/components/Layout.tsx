@@ -16,14 +16,16 @@ const TITLES: Record<string, string> = {
   '/': 'YeahAyat — Portfolio',
   '/projects': 'YeahAyat — Проекты',
   '/contact': 'YeahAyat — Контакты',
-  '/github': 'YeahAyat — GitHub'
+  '/github': 'YeahAyat — GitHub',
+  '/privacy': 'YeahAyat — Политика конфиденциальности'
 };
 
 const PAGE_KEYS: Record<string, string> = {
   '/': 'home',
   '/projects': 'projects',
   '/contact': 'contact',
-  '/github': 'github'
+  '/github': 'github',
+  '/privacy': 'privacy'
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -69,6 +71,9 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       <footer className="footer reveal">
         <p>© {new Date().getFullYear()} YeahAyat</p>
+        <TransitionLink className="footer-link" to="/privacy">
+          Политика конфиденциальности
+        </TransitionLink>
       </footer>
     </>
   );

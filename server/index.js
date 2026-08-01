@@ -78,6 +78,10 @@ app.post('/api/contact', async (req, res) => {
     return res.status(400).json({ ok: false, error: 'Заполни все поля.' });
   }
 
+  if (req.body?.consent !== true) {
+    return res.status(400).json({ ok: false, error: 'Нужно согласие с политикой конфиденциальности.' });
+  }
+
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
     console.error('[contact] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID не заданы');
     return res.status(503).json({ ok: false, error: 'Форма временно не настроена.' });
