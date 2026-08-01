@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0e1f"/>
+      <stop offset="1" stop-color="#050713"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.3" cy="0.25" r="0.9">
+      <stop offset="0" stop-color="#f4c95d" stop-opacity="0.22"/>
+      <stop offset="0.55" stop-color="#68e1fd" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4c95d"/>
+      <stop offset="1" stop-color="#68e1fd"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" rx="18" fill="url(#bg)"/>
+  <rect width="1200" height="750" rx="18" fill="url(#glow)"/>
+  <rect x="0" y="0" width="1200" height="64" rx="18" fill="#0d1226"/>
+  <rect x="0" y="32" width="1200" height="32" fill="#0d1226"/>
+  <circle cx="36" cy="32" r="7" fill="#ff5f57"/>
+  <circle cx="60" cy="32" r="7" fill="#febc2e"/>
+  <circle cx="84" cy="32" r="7" fill="#28c840"/>
+  <rect x="120" y="16" width="520" height="32" rx="16" fill="#141a33"/>
+  <text x="140" y="37" font-family="monospace" font-size="16" fill="#9aa7c2">https://studyloop.tech</text>
+  <text x="600" y="360" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="72" font-weight="700" fill="#f4f7ff">StudyLoop</text>
+  <rect x="480" y="396" width="240" height="4" rx="2" fill="url(#bar)"/>
+  <text x="600" y="452" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="24" fill="#9aa7c2">скриншоты скоро</text>
+  <g opacity="0.45">
+    <rect x="120" y="540" width="300" height="120" rx="14" fill="#10162e"/>
+    <rect x="450" y="540" width="300" height="120" rx="14" fill="#10162e"/>
+    <rect x="780" y="540" width="300" height="120" rx="14" fill="#10162e"/>
+    <rect x="146" y="568" width="180" height="10" rx="5" fill="#232c4f"/>
+    <rect x="146" y="592" width="240" height="8" rx="4" fill="#1a2140"/>
+    <rect x="476" y="568" width="180" height="10" rx="5" fill="#232c4f"/>
+    <rect x="476" y="592" width="240" height="8" rx="4" fill="#1a2140"/>
+    <rect x="806" y="568" width="180" height="10" rx="5" fill="#232c4f"/>
+    <rect x="806" y="592" width="240" height="8" rx="4" fill="#1a2140"/>
+  </g>
+</svg>

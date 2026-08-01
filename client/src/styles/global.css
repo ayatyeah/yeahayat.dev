@@ -1306,3 +1306,292 @@ body.is-routing a[data-nav-link="true"] {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ============================================================
+   v2.1 — aurora-фон, витрина кейсов со скриншотами, лайтбокс
+   ============================================================ */
+
+/* --- Живой aurora-фон (между 3D-канвасом и контентом) --- */
+.aurora-layer {
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(70px) saturate(1.2);
+  opacity: 0.55;
+}
+
+.aurora-layer::before,
+.aurora-layer::after {
+  content: "";
+  position: absolute;
+  width: 55vmax;
+  height: 55vmax;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.aurora-layer::before {
+  left: -8%;
+  top: -6%;
+  background: radial-gradient(circle at 30% 30%, rgba(104, 225, 253, 0.32), rgba(135, 92, 255, 0.16) 45%, transparent 70%);
+  animation: auroraDriftA 26s ease-in-out infinite alternate;
+}
+
+.aurora-layer::after {
+  right: -12%;
+  bottom: -10%;
+  background: radial-gradient(circle at 60% 60%, rgba(135, 92, 255, 0.28), rgba(244, 201, 93, 0.12) 50%, transparent 72%);
+  animation: auroraDriftB 32s ease-in-out infinite alternate;
+}
+
+@keyframes auroraDriftA {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(9vw, 7vh, 0) scale(1.12); }
+  100% { transform: translate3d(-4vw, 12vh, 0) scale(0.94); }
+}
+
+@keyframes auroraDriftB {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-8vw, -6vh, 0) scale(1.1); }
+  100% { transform: translate3d(5vw, -11vh, 0) scale(0.96); }
+}
+
+/* --- Кейсы на главной --- */
+.home-cases {
+  position: relative;
+  z-index: 3;
+  padding: 1rem 0 2rem;
+}
+
+/* --- Сетка кейсов --- */
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: 1.4rem;
+  margin-top: 1.6rem;
+}
+
+.case-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.16, 0.98, 0.22, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.case-card:hover {
+  border-color: rgba(169, 199, 255, 0.4);
+  box-shadow: var(--shadow);
+}
+
+.case-card-featured {
+  grid-column: span 2;
+}
+
+@media (max-width: 860px) {
+  .case-card-featured {
+    grid-column: span 1;
+  }
+}
+
+.case-shot {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: #070a18;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.case-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 0.98, 0.22, 1), filter 0.4s ease;
+}
+
+.case-shot:hover img,
+.case-shot:focus-visible img {
+  transform: scale(1.045);
+  filter: brightness(1.08);
+}
+
+.case-shot-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%) translateY(8px);
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(169, 199, 255, 0.4);
+  background: rgba(5, 7, 19, 0.78);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.case-shot:hover .case-shot-hint,
+.case-shot:focus-visible .case-shot-hint {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.case-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.15rem 1.3rem 1.3rem;
+}
+
+.case-body h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+
+.case-body p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.case-body .project-link {
+  margin-top: 0.35rem;
+  align-self: flex-start;
+}
+
+/* --- Лайтбокс --- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.8rem, 3vw, 2.4rem);
+  background: rgba(2, 3, 10, 0.88);
+  backdrop-filter: blur(14px);
+  animation: lightboxIn 0.28s ease both;
+}
+
+@keyframes lightboxIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox-figure {
+  position: relative;
+  margin: 0;
+  max-width: min(1200px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.lightbox-img {
+  max-width: 100%;
+  max-height: calc(100vh - 9rem);
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  box-shadow: 0 40px 140px rgba(0, 0, 0, 0.7);
+  animation: lightboxImgIn 0.34s cubic-bezier(0.16, 0.98, 0.22, 1) both;
+}
+
+@keyframes lightboxImgIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lightbox-caption {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+}
+
+.lightbox-caption span:first-child {
+  color: var(--ink);
+}
+
+.lightbox-counter {
+  opacity: 0.75;
+}
+
+.lightbox-visit {
+  margin-left: auto;
+  color: var(--acid);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.lightbox-visit:hover {
+  border-color: var(--acid);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: clamp(0.8rem, 2.4vw, 1.6rem);
+  right: clamp(0.8rem, 2.4vw, 1.6rem);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(8, 12, 26, 0.8);
+  color: var(--ink);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.lightbox-close:hover {
+  border-color: rgba(169, 199, 255, 0.5);
+  transform: rotate(90deg);
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(8, 12, 26, 0.8);
+  color: var(--ink);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.lightbox-nav:hover {
+  border-color: rgba(169, 199, 255, 0.5);
+  background: rgba(14, 20, 42, 0.92);
+}
+
+.lightbox-prev { left: -8px; }
+.lightbox-next { right: -8px; }
+
+@media (max-width: 640px) {
+  .lightbox-prev { left: 6px; }
+  .lightbox-next { right: 6px; }
+  .lightbox-caption { flex-wrap: wrap; row-gap: 0.3rem; }
+}

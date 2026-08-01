@@ -1,4 +1,5 @@
 import { TransitionLink } from '../lib/transition';
+import ProjectShowcase from '../components/ProjectShowcase';
 
 const SKILLS = ['C++', 'Python', 'JavaScript', 'Spring Boot', 'Node.js', 'Docker', 'React', 'Go', 'Java', 'REST API', 'UX'];
 
@@ -14,18 +15,18 @@ export default function Home() {
     <main className="page-main page-main-home">
       <section className="hero hero-core reveal" aria-label="YeahAyat">
         <div className="display-hub home-intro">
-          <img className="hero-mark" src="/logo_clean.webp" alt="YeahAyat" width={132} height={132} />
+          <img className="hero-mark" src="/logo_mark_light.webp" alt="YeahAyat" width={132} height={132} />
           <h1 className="display-word">Ayat Balmagambet</h1>
           <p className="hero-copy">
             Делаю сайты и приложения, которые выглядят живыми, быстро работают и не разваливаются под реальными
-            задачами. Люблю чистую логику, спокойные интерфейсы и проекты, где у каждой детали есть смысл.
+            задачами. Ниже — кейсы, которые уже в работе.
           </p>
         </div>
 
         <div className="quick-links" aria-label="Быстрые ссылки">
-          <TransitionLink className="btn btn-white magnetic" to="/projects">
-            Смотреть проекты
-          </TransitionLink>
+          <a className="btn btn-white magnetic" href="#cases">
+            Смотреть кейсы
+          </a>
           <TransitionLink className="btn btn-dark magnetic" to="/contact">
             Связаться
           </TransitionLink>
@@ -39,7 +40,15 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="impact-grid reveal" aria-label="Профиль">
+      <section className="home-cases reveal" id="cases" aria-label="Кейсы">
+        <div className="section-head">
+          <p className="panel-label">кейсы</p>
+          <h2>Проекты, которые можно посмотреть прямо здесь.</h2>
+        </div>
+        <ProjectShowcase />
+      </section>
+
+      <section className="impact-grid reveal" aria-label="Обо мне">
         <article className="impact-panel panel-tall" data-tilt>
           <p className="panel-label">обо мне</p>
           <h2>Собираю идеи в работающие продукты: от интерфейса до серверной логики.</h2>

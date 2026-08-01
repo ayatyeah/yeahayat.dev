@@ -137,7 +137,7 @@ export default function VoidScene() {
     torusB.rotation.x = Math.PI / 2.8;
     coreGroup.add(torusA, torusB);
 
-    const logoTexture = new THREE.TextureLoader().load('/logo_clean.webp');
+    const logoTexture = new THREE.TextureLoader().load('/logo_mark_light.webp');
     logoTexture.colorSpace = THREE.SRGBColorSpace;
     const logoPlane = new THREE.Mesh(
       new THREE.PlaneGeometry(1.15, 1.15),
