@@ -40,7 +40,6 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <>
       <VoidScene />
-      <div className="aurora-layer" aria-hidden="true" />
       <div className="noise-layer" aria-hidden="true" />
       <div className="scan-layer" aria-hidden="true" />
       <CursorAura />

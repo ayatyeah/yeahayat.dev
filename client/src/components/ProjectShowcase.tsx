@@ -3,6 +3,7 @@
 // Используется и на главной, и на странице «Проекты».
 
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { PROJECTS, type Project } from '../data/projects';
 
 type LightboxState = { project: Project; index: number } | null;
@@ -29,7 +30,9 @@ function Lightbox({ state, onClose, onStep }: { state: LightboxState; onClose: (
   const { project, index } = state;
   const many = project.screens.length > 1;
 
-  return (
+  // Портал в body: предки с transform/filter ломают position: fixed,
+  // поэтому лайтбокс рендерится вне дерева секций.
+  return createPortal(
     <div className="lightbox" role="dialog" aria-modal="true" aria-label={`Скриншоты ${project.title}`} onClick={onClose}>
       <figure className="lightbox-figure" onClick={(event) => event.stopPropagation()}>
         <img className="lightbox-img" src={project.screens[index].src} alt={`${project.title} — ${project.screens[index].caption}`} />
@@ -59,7 +62,8 @@ function Lightbox({ state, onClose, onStep }: { state: LightboxState; onClose: (
       <button className="lightbox-close" onClick={onClose} aria-label="Закрыть">
         ✕
       </button>
-    </div>
+    </div>,
+    document.body
   );
 }
 

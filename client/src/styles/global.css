@@ -992,7 +992,9 @@ a {
 
 .reveal.visible {
   opacity: 1;
-  transform: translateY(0) rotateX(0) scale(1);
+  /* none, а не identity-transform: иначе position: fixed у потомков
+     (лайтбокс) считается от секции, и снимается лишний слой композитинга */
+  transform: none;
 }
 
 .ya-transition {
@@ -1310,54 +1312,8 @@ body.is-routing a[data-nav-link="true"] {
 }
 
 /* ============================================================
-   v2.1 — aurora-фон, витрина кейсов со скриншотами, лайтбокс
+   v2.1 — витрина кейсов со скриншотами, лайтбокс
    ============================================================ */
-
-/* --- Живой aurora-фон (между 3D-канвасом и контентом) --- */
-.aurora-layer {
-  position: fixed;
-  inset: -20%;
-  z-index: 0;
-  pointer-events: none;
-  filter: blur(70px) saturate(1.2);
-  opacity: 0.55;
-}
-
-.aurora-layer::before,
-.aurora-layer::after {
-  content: "";
-  position: absolute;
-  width: 55vmax;
-  height: 55vmax;
-  border-radius: 50%;
-  will-change: transform;
-}
-
-.aurora-layer::before {
-  left: -8%;
-  top: -6%;
-  background: radial-gradient(circle at 30% 30%, rgba(11, 147, 184, 0.20), rgba(112, 72, 232, 0.10) 45%, transparent 70%);
-  animation: auroraDriftA 26s ease-in-out infinite alternate;
-}
-
-.aurora-layer::after {
-  right: -12%;
-  bottom: -10%;
-  background: radial-gradient(circle at 60% 60%, rgba(112, 72, 232, 0.16), rgba(201, 136, 15, 0.10) 50%, transparent 72%);
-  animation: auroraDriftB 32s ease-in-out infinite alternate;
-}
-
-@keyframes auroraDriftA {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(9vw, 7vh, 0) scale(1.12); }
-  100% { transform: translate3d(-4vw, 12vh, 0) scale(0.94); }
-}
-
-@keyframes auroraDriftB {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(-8vw, -6vh, 0) scale(1.1); }
-  100% { transform: translate3d(5vw, -11vh, 0) scale(0.96); }
-}
 
 /* --- Кейсы на главной --- */
 .home-cases {

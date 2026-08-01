@@ -1,57 +1,151 @@
-// Фоновая Three.js сцена (ядро + осколки + звёзды).
-// Отличия от старой версии:
-//  - three ставится из npm и tree-shake'ится, а не грузится целиком с unpkg;
-//  - рендер останавливается, когда вкладка не видна (visibilitychange);
-//  - полный cleanup при размонтировании (dispose геометрий/материалов/рендерера);
-//  - при prefers-reduced-motion рисуется один статичный кадр без цикла.
+// Фоновое небо на чистом WebGL: процедурные облака (FBM) + разряды молний.
+// Один fullscreen-треугольник, один draw call — вместо тяжёлой 3D-библиотеки.
+// Внешняя 3D-библиотека удалена из зависимостей (−120 КБ gzip в бандле).
+// Оптимизации: DPR cap, пауза при скрытой вкладке, статичный кадр при
+// prefers-reduced-motion, меньше октав шума на мобильных.
 
 import { useEffect, useRef } from 'react';
-import * as THREE from 'three';
 
-function createParticleTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 64;
-  canvas.height = 64;
-  const context = canvas.getContext('2d')!;
-  const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 30);
-  gradient.addColorStop(0, 'rgba(23,27,36,1)');
-  gradient.addColorStop(0.28, 'rgba(59,91,219,0.8)');
-  gradient.addColorStop(1, 'rgba(59,91,219,0)');
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, 64, 64);
-  return new THREE.CanvasTexture(canvas);
+const VERT = `
+attribute vec2 a_pos;
+void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+`;
+
+const FRAG = `
+precision highp float;
+
+uniform vec2  u_res;
+uniform float u_time;
+uniform vec2  u_mouse;   // -1..1, сглаженная
+uniform float u_scroll;  // 0..1
+
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
 }
 
-function makeShard(index: number, total: number) {
-  const geometry = new THREE.TetrahedronGeometry(0.25 + Math.random() * 0.52, 0);
-  const palette = [0x0b93b8, 0xc9880f, 0x8d315a, 0x3b5bdb, 0x171b24];
-  const material = new THREE.MeshStandardMaterial({
-    color: palette[index % palette.length],
-    emissive: palette[index % palette.length],
-    emissiveIntensity: 0.06,
-    roughness: 0.5,
-    metalness: 0.76,
-    transparent: true,
-    opacity: 0.85
-  });
-  const mesh = new THREE.Mesh(geometry, material);
-  const angle = (index / total) * Math.PI * 2;
-  const radius = 4 + Math.random() * 7;
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+    mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+    u.y
+  );
+}
 
-  mesh.position.set(Math.cos(angle) * radius, (Math.random() - 0.5) * 5.8, Math.sin(angle) * radius - 1);
-  mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-  mesh.userData = {
-    angle,
-    radius,
-    spin: new THREE.Vector3(
-      (Math.random() - 0.5) * 0.007,
-      (Math.random() - 0.5) * 0.01,
-      (Math.random() - 0.5) * 0.008
-    ),
-    float: Math.random() * Math.PI * 2
-  };
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < OCTAVES; i++) {
+    v += a * noise(p);
+    p = p * 2.03 + vec2(11.7, 7.3);
+    a *= 0.5;
+  }
+  return v;
+}
 
-  return mesh;
+// Один разряд молнии: period — период цикла в секундах, seed — уникальность.
+// Возвращает вклад света (0..~1.5) для пикселя uv.
+float bolt(vec2 uv, float period, float seed) {
+  float cycle = floor(u_time / period + seed);
+  float phase = fract(u_time / period + seed);
+
+  // Вспышка живёт первые ~22% цикла: резкий пик, быстрый спад, мерцание.
+  if (phase > 0.24) return 0.0;
+  float env = exp(-phase * 16.0) * (0.72 + 0.28 * noise(vec2(u_time * 34.0, cycle)));
+
+  // Корень удара и глубина (до какой высоты бьёт).
+  float rootX = 0.18 + 0.64 * hash(vec2(cycle, seed * 7.31));
+  float depth = 0.5 + 0.38 * hash(vec2(cycle * 3.7, seed));
+
+  // Ломаная траектория: смещение по шуму, растёт с глубиной.
+  float wob = (noise(vec2(uv.y * 6.5, cycle * 13.7)) - 0.5) * 0.34 * (0.25 + uv.y)
+            + (noise(vec2(uv.y * 23.0, cycle * 31.1)) - 0.5) * 0.06;
+  float px = rootX + wob;
+
+  float d = abs(uv.x - px);
+  float reach = smoothstep(depth, depth - 0.12, uv.y);
+
+  float core = exp(-d * 220.0) * 1.2;
+  float glow = exp(-d * 26.0) * 0.42;
+
+  // Ветка: короче, тоньше, со своим изломом.
+  float bx = px + (noise(vec2(uv.y * 11.0, cycle * 53.3)) - 0.5) * 0.22 + (uv.y - 0.2) * 0.12;
+  float bd = abs(uv.x - bx);
+  float branch = (exp(-bd * 260.0) * 0.7 + exp(-bd * 40.0) * 0.2)
+               * smoothstep(depth * 0.6, depth * 0.6 - 0.1, uv.y);
+
+  return (core + glow + branch) * reach * env;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_res;
+  uv.y = 1.0 - uv.y; // 0 — верх экрана
+  float aspect = u_res.x / u_res.y;
+
+  // --- Небо: светлый градиент в палитре сайта ---
+  vec3 top = vec3(0.835, 0.865, 0.955);
+  vec3 bottom = vec3(0.965, 0.975, 0.995);
+  vec3 col = mix(top, bottom, smoothstep(0.0, 1.0, uv.y));
+
+  // лёгкая подкраска у горизонта
+  col += vec3(0.045, 0.03, 0.0) * (1.0 - uv.y) * 0.35;
+
+  // --- Облака: два слоя с параллаксом от мыши и скролла ---
+  vec2 wind = vec2(u_time * 0.014, 0.0);
+  vec2 par = u_mouse * vec2(0.012, 0.008);
+
+  vec2 p1 = vec2(uv.x * aspect, uv.y) * vec2(1.6, 2.9) + wind + par + vec2(0.0, u_scroll * 0.4);
+  float c1 = fbm(p1);
+  float m1 = smoothstep(0.44, 0.78, c1);
+
+  vec2 p2 = vec2(uv.x * aspect, uv.y) * vec2(3.1, 5.4) + wind * 2.1 + par * 1.7 + vec2(3.7, u_scroll * 0.7);
+  float c2 = fbm(p2);
+  float m2 = smoothstep(0.5, 0.85, c2);
+
+  // объём: нижняя кромка облаков чуть темнее
+  float shade1 = fbm(p1 + vec2(0.0, 0.14));
+  vec3 cloudLit = vec3(1.0);
+  vec3 cloudShadow = vec3(0.78, 0.81, 0.9);
+  vec3 cloud1 = mix(cloudShadow, cloudLit, smoothstep(-0.12, 0.3, c1 - shade1) * 0.8 + 0.2);
+
+  col = mix(col, cloud1, m1 * 0.82);
+  col = mix(col, cloudLit, m2 * 0.38);
+
+  // --- Молнии: два независимых разряда ---
+  float l1 = bolt(vec2(uv.x, uv.y), 9.0, 0.37);
+  float l2 = bolt(vec2(uv.x, uv.y), 13.0, 0.81);
+  float l = l1 + l2;
+
+  vec3 boltCol = mix(vec3(0.28, 0.38, 0.92), vec3(0.5, 0.36, 0.98), uv.y); // индиго -> фиолет
+  col += boltCol * l;
+
+  // общий отсвет неба во время удара
+  float flashEnv = 0.0;
+  {
+    float ph1 = fract(u_time / 9.0 + 0.37);
+    float ph2 = fract(u_time / 13.0 + 0.81);
+    if (ph1 < 0.24) flashEnv += exp(-ph1 * 16.0);
+    if (ph2 < 0.24) flashEnv += exp(-ph2 * 16.0);
+  }
+  col += vec3(0.32, 0.34, 0.6) * flashEnv * 0.05 * (1.0 - uv.y * 0.6);
+
+  // дизеринг против полос градиента
+  col += (hash(gl_FragCoord.xy) - 0.5) * 0.008;
+
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+function compile(gl: WebGLRenderingContext, type: number, src: string) {
+  const shader = gl.createShader(type)!;
+  gl.shaderSource(shader, src);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error(gl.getShaderInfoLog(shader));
+  }
+  return shader;
 }
 
 export default function VoidScene() {
@@ -61,226 +155,98 @@ export default function VoidScene() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true,
+    const gl = canvas.getContext('webgl', {
+      alpha: false,
+      antialias: false,
+      depth: false,
+      stencil: false,
       powerPreference: 'high-performance'
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    if (!gl) return; // нет WebGL — останется CSS-градиент body
 
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0xeef1f9, 0.045);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const octaves = window.innerWidth < 760 ? 4 : 5;
 
-    const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 120);
-    camera.position.set(0, 0.2, 9);
-
-    const rig = new THREE.Group();
-    scene.add(rig);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-
-    const cyanLight = new THREE.PointLight(0x0b93b8, 3.6, 24);
-    cyanLight.position.set(-5.4, 3.4, 4);
-    scene.add(cyanLight);
-
-    const hotLight = new THREE.PointLight(0x8d315a, 2.6, 24);
-    hotLight.position.set(5.2, -1.6, 3.5);
-    scene.add(hotLight);
-
-    const acidLight = new THREE.DirectionalLight(0xc9880f, 1.6);
-    acidLight.position.set(0.5, 1, 1.4);
-    scene.add(acidLight);
-
-    const coreGroup = new THREE.Group();
-    rig.add(coreGroup);
-
-    const core = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(1.72, 8),
-      new THREE.MeshPhysicalMaterial({
-        color: 0x171b24,
-        emissive: 0x0c0f16,
-        emissiveIntensity: 0.1,
-        roughness: 0.2,
-        metalness: 0.82,
-        transmission: 0.12,
-        thickness: 0.7,
-        clearcoat: 1,
-        clearcoatRoughness: 0.16
-      })
-    );
-    coreGroup.add(core);
-
-    const wire = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(2.1, 2),
-      new THREE.MeshBasicMaterial({ color: 0x3b5bdb, wireframe: true, transparent: true, opacity: 0.2 })
-    );
-    coreGroup.add(wire);
-
-    const torusMaterial = new THREE.MeshStandardMaterial({
-      color: 0xc9880f,
-      emissive: 0x3a2705,
-      emissiveIntensity: 0.12,
-      roughness: 0.28,
-      metalness: 0.9
-    });
-    const torusA = new THREE.Mesh(new THREE.TorusKnotGeometry(2.45, 0.025, 260, 12, 2, 5), torusMaterial);
-    const torusB = new THREE.Mesh(new THREE.TorusGeometry(3.05, 0.018, 10, 220), torusMaterial.clone());
-    (torusB.material as THREE.MeshStandardMaterial).color.setHex(0x0b93b8);
-    (torusB.material as THREE.MeshStandardMaterial).emissive.setHex(0x0a2f38);
-    torusB.rotation.x = Math.PI / 2.8;
-    coreGroup.add(torusA, torusB);
-
-    const logoTexture = new THREE.TextureLoader().load('/logo_mark.webp');
-    logoTexture.colorSpace = THREE.SRGBColorSpace;
-    const logoPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.15, 1.15),
-      new THREE.MeshBasicMaterial({ map: logoTexture, transparent: true, opacity: 0.9, depthWrite: false })
-    );
-    logoPlane.position.z = 1.94;
-    coreGroup.add(logoPlane);
-
-    const shardGroup = new THREE.Group();
-    const shardCount = window.innerWidth < 760 ? 34 : 58;
-    for (let index = 0; index < shardCount; index += 1) {
-      shardGroup.add(makeShard(index, shardCount));
+    const program = gl.createProgram()!;
+    gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, VERT));
+    gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, FRAG.replace(/OCTAVES/g, String(octaves))));
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error(gl.getProgramInfoLog(program));
+      return;
     }
-    rig.add(shardGroup);
+    gl.useProgram(program);
 
-    const starCount = window.innerWidth < 760 ? 850 : 1500;
-    const starPositions = new Float32Array(starCount * 3);
-    const starColors = new Float32Array(starCount * 3);
-    const color = new THREE.Color();
+    // Fullscreen-треугольник
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(program, 'a_pos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
-    for (let index = 0; index < starCount; index += 1) {
-      const i = index * 3;
-      const radius = 10 + Math.random() * 34;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
+    const uRes = gl.getUniformLocation(program, 'u_res');
+    const uTime = gl.getUniformLocation(program, 'u_time');
+    const uMouse = gl.getUniformLocation(program, 'u_mouse');
+    const uScroll = gl.getUniformLocation(program, 'u_scroll');
 
-      starPositions[i] = radius * Math.sin(phi) * Math.cos(theta);
-      starPositions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      starPositions[i + 2] = radius * Math.cos(phi) - 14;
-
-      color.setHSL([0.58, 0.1, 0.52, 0.68][index % 4], 0.55, 0.3);
-      starColors[i] = color.r;
-      starColors[i + 1] = color.g;
-      starColors[i + 2] = color.b;
-    }
-
-    const starGeometry = new THREE.BufferGeometry();
-    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-
-    const stars = new THREE.Points(
-      starGeometry,
-      new THREE.PointsMaterial({
-        size: 0.1,
-        map: createParticleTexture(),
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.5,
-        depthWrite: false,
-        blending: THREE.NormalBlending
-      })
-    );
-    scene.add(stars);
-
-    const clock = new THREE.Clock();
-    const pointer = new THREE.Vector2(0, 0);
-    const targetPointer = new THREE.Vector2(0, 0);
+    const mouse = { x: 0, y: 0 };
+    const target = { x: 0, y: 0 };
     let scroll = 0;
     let targetScroll = 0;
     let rafId = 0;
     let running = true;
+    const start = performance.now();
 
-    const onResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
-      renderer.setSize(window.innerWidth, window.innerHeight);
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      targetPointer.x = (event.clientX / window.innerWidth - 0.5) * 2;
-      targetPointer.y = (event.clientY / window.innerHeight - 0.5) * 2;
+      target.x = (event.clientX / window.innerWidth - 0.5) * 2;
+      target.y = (event.clientY / window.innerHeight - 0.5) * 2;
     };
 
     const onScroll = () => {
-      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      targetScroll = window.scrollY / maxScroll;
+      const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      targetScroll = window.scrollY / max;
+    };
+
+    const draw = (timeSec: number) => {
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uTime, timeSec);
+      gl.uniform2f(uMouse, mouse.x, mouse.y);
+      gl.uniform1f(uScroll, scroll);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+
+    const tick = () => {
+      if (!running) return;
+      mouse.x += (target.x - mouse.x) * 0.05;
+      mouse.y += (target.y - mouse.y) * 0.05;
+      scroll += (targetScroll - scroll) * 0.07;
+      draw((performance.now() - start) / 1000);
+      rafId = requestAnimationFrame(tick);
     };
 
     const onVisibility = () => {
       running = !document.hidden;
-      if (running && !reduced) {
-        clock.getDelta(); // сбрасываем дельту, чтобы не было рывка
-        rafId = requestAnimationFrame(tick);
-      }
+      if (running && !reduced) rafId = requestAnimationFrame(tick);
     };
 
-    window.addEventListener('resize', onResize);
+    window.addEventListener('resize', resize);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('visibilitychange', onVisibility);
+
+    resize();
     onScroll();
 
-    function tick() {
-      if (!running) return;
-
-      const elapsed = clock.getElapsedTime();
-      const delta = Math.min(clock.getDelta(), 0.033);
-
-      pointer.lerp(targetPointer, 0.052);
-      scroll += (targetScroll - scroll) * 0.06;
-
-      rig.rotation.y = pointer.x * 0.2 + scroll * Math.PI * 0.52;
-      rig.rotation.x = -pointer.y * 0.11 + scroll * 0.14;
-      rig.position.y = scroll * -1.1;
-
-      core.rotation.x += delta * 0.16;
-      core.rotation.y += delta * 0.25;
-      wire.rotation.x -= delta * 0.12;
-      wire.rotation.z += delta * 0.18;
-      torusA.rotation.x += delta * 0.18;
-      torusA.rotation.y -= delta * 0.12;
-      torusB.rotation.z -= delta * 0.16;
-      logoPlane.rotation.z = Math.sin(elapsed * 0.55) * 0.025;
-
-      shardGroup.children.forEach((shard) => {
-        const data = shard.userData as {
-          angle: number;
-          radius: number;
-          spin: THREE.Vector3;
-          float: number;
-        };
-        data.angle += delta * (0.06 + data.radius * 0.0035);
-        shard.position.x = Math.cos(data.angle) * data.radius;
-        shard.position.z = Math.sin(data.angle) * data.radius - 1;
-        shard.position.y += Math.sin(elapsed + data.float) * 0.0011;
-        shard.rotation.x += data.spin.x;
-        shard.rotation.y += data.spin.y;
-        shard.rotation.z += data.spin.z;
-      });
-
-      stars.rotation.y -= delta * 0.009;
-      stars.rotation.x = pointer.y * 0.016;
-      camera.position.x = pointer.x * 0.38;
-      camera.position.y = 0.2 - pointer.y * 0.28;
-      camera.lookAt(0, -0.05, 0);
-
-      renderer.render(scene, camera);
-      rafId = requestAnimationFrame(tick);
-    }
-
     if (reduced) {
-      renderer.render(scene, camera); // один статичный кадр
+      draw(3.0); // один спокойный кадр с облаками, без молний
     } else {
       rafId = requestAnimationFrame(tick);
     }
@@ -288,20 +254,13 @@ export default function VoidScene() {
     return () => {
       running = false;
       cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', resize);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('scroll', onScroll);
       document.removeEventListener('visibilitychange', onVisibility);
-
-      scene.traverse((object) => {
-        const mesh = object as THREE.Mesh;
-        if (mesh.geometry) mesh.geometry.dispose();
-        const material = mesh.material as THREE.Material | THREE.Material[] | undefined;
-        if (Array.isArray(material)) material.forEach((m) => m.dispose());
-        else material?.dispose();
-      });
-      logoTexture.dispose();
-      renderer.dispose();
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
   }, []);
 
