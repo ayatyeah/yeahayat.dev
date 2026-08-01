@@ -32,9 +32,10 @@ function Lightbox({ state, onClose, onStep }: { state: LightboxState; onClose: (
   return (
     <div className="lightbox" role="dialog" aria-modal="true" aria-label={`Скриншоты ${project.title}`} onClick={onClose}>
       <figure className="lightbox-figure" onClick={(event) => event.stopPropagation()}>
-        <img className="lightbox-img" src={project.screens[index]} alt={`${project.title} — скриншот ${index + 1}`} />
+        <img className="lightbox-img" src={project.screens[index].src} alt={`${project.title} — ${project.screens[index].caption}`} />
         <figcaption className="lightbox-caption">
           <span>{project.title}</span>
+          <span className="lightbox-page">{project.screens[index].caption}</span>
           {many && (
             <span className="lightbox-counter">
               {index + 1} / {project.screens.length}
@@ -85,8 +86,9 @@ export default function ProjectShowcase() {
               onClick={() => setLightbox({ project, index: 0 })}
               aria-label={`Смотреть скриншоты ${project.title}`}
             >
-              <img src={project.screens[0]} alt={`${project.title} — превью`} loading="lazy" />
+              <img src={project.screens[0].src} alt={`${project.title} — превью`} loading="lazy" />
               <span className="case-shot-hint">смотреть кейс</span>
+              {project.screens.length > 1 && <span className="case-shot-count">{project.screens.length} скр.</span>}
             </button>
             <div className="case-body">
               <p className="panel-label">{project.label}</p>
