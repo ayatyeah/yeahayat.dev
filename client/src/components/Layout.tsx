@@ -54,7 +54,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <TransitionLink className="brand magnetic" to="/" aria-label="На главную">
           <span className="brand-text">YeahAyat</span>
           <span className="brand-mark-wrap">
-            <img className="brand-mark" src="/logo_mark_light_192.webp" alt="" width={40} height={40} />
+            <img className="brand-mark" src="/logo_mark_192.webp" alt="" width={40} height={40} />
           </span>
         </TransitionLink>
 

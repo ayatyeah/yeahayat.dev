@@ -15,7 +15,7 @@ export default function Home() {
     <main className="page-main page-main-home">
       <section className="hero hero-core reveal" aria-label="YeahAyat">
         <div className="display-hub home-intro">
-          <img className="hero-mark" src="/logo_mark_light.webp" alt="YeahAyat" width={132} height={132} />
+          <img className="hero-mark" src="/logo_mark.webp" alt="YeahAyat" width={132} height={132} />
           <h1 className="display-word">Ayat Balmagambet</h1>
           <p className="hero-copy">
             Делаю сайты и приложения, которые выглядят живыми, быстро работают и не разваливаются под реальными

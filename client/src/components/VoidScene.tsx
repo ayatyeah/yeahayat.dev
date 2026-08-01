@@ -14,9 +14,9 @@ function createParticleTexture() {
   canvas.height = 64;
   const context = canvas.getContext('2d')!;
   const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 30);
-  gradient.addColorStop(0, 'rgba(255,255,255,1)');
-  gradient.addColorStop(0.28, 'rgba(216,185,106,0.82)');
-  gradient.addColorStop(1, 'rgba(216,185,106,0)');
+  gradient.addColorStop(0, 'rgba(23,27,36,1)');
+  gradient.addColorStop(0.28, 'rgba(59,91,219,0.8)');
+  gradient.addColorStop(1, 'rgba(59,91,219,0)');
   context.fillStyle = gradient;
   context.fillRect(0, 0, 64, 64);
   return new THREE.CanvasTexture(canvas);
@@ -24,15 +24,15 @@ function createParticleTexture() {
 
 function makeShard(index: number, total: number) {
   const geometry = new THREE.TetrahedronGeometry(0.25 + Math.random() * 0.52, 0);
-  const palette = [0x78c7d4, 0xd8b96a, 0x8d315a, 0xd79d55, 0xf4f1e8];
+  const palette = [0x0b93b8, 0xc9880f, 0x8d315a, 0x3b5bdb, 0x171b24];
   const material = new THREE.MeshStandardMaterial({
     color: palette[index % palette.length],
     emissive: palette[index % palette.length],
-    emissiveIntensity: 0.14,
+    emissiveIntensity: 0.06,
     roughness: 0.5,
     metalness: 0.76,
     transparent: true,
-    opacity: 0.78
+    opacity: 0.85
   });
   const mesh = new THREE.Mesh(geometry, material);
   const angle = (index / total) * Math.PI * 2;
@@ -73,10 +73,10 @@ export default function VoidScene() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.0;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030406, 0.052);
+    scene.fog = new THREE.FogExp2(0xeef1f9, 0.045);
 
     const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 120);
     camera.position.set(0, 0.2, 9);
@@ -84,17 +84,17 @@ export default function VoidScene() {
     const rig = new THREE.Group();
     scene.add(rig);
 
-    scene.add(new THREE.AmbientLight(0xf4f1e8, 0.44));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
 
-    const cyanLight = new THREE.PointLight(0x78c7d4, 5.4, 24);
+    const cyanLight = new THREE.PointLight(0x0b93b8, 3.6, 24);
     cyanLight.position.set(-5.4, 3.4, 4);
     scene.add(cyanLight);
 
-    const hotLight = new THREE.PointLight(0x8d315a, 4.2, 24);
+    const hotLight = new THREE.PointLight(0x8d315a, 2.6, 24);
     hotLight.position.set(5.2, -1.6, 3.5);
     scene.add(hotLight);
 
-    const acidLight = new THREE.DirectionalLight(0xd8b96a, 2.15);
+    const acidLight = new THREE.DirectionalLight(0xc9880f, 1.6);
     acidLight.position.set(0.5, 1, 1.4);
     scene.add(acidLight);
 
@@ -104,9 +104,9 @@ export default function VoidScene() {
     const core = new THREE.Mesh(
       new THREE.IcosahedronGeometry(1.72, 8),
       new THREE.MeshPhysicalMaterial({
-        color: 0x07090d,
-        emissive: 0x10131a,
-        emissiveIntensity: 0.16,
+        color: 0x171b24,
+        emissive: 0x0c0f16,
+        emissiveIntensity: 0.1,
         roughness: 0.2,
         metalness: 0.82,
         transmission: 0.12,
@@ -119,25 +119,25 @@ export default function VoidScene() {
 
     const wire = new THREE.Mesh(
       new THREE.IcosahedronGeometry(2.1, 2),
-      new THREE.MeshBasicMaterial({ color: 0x78c7d4, wireframe: true, transparent: true, opacity: 0.18 })
+      new THREE.MeshBasicMaterial({ color: 0x3b5bdb, wireframe: true, transparent: true, opacity: 0.2 })
     );
     coreGroup.add(wire);
 
     const torusMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd8b96a,
-      emissive: 0x4f3f1c,
-      emissiveIntensity: 0.22,
+      color: 0xc9880f,
+      emissive: 0x3a2705,
+      emissiveIntensity: 0.12,
       roughness: 0.28,
       metalness: 0.9
     });
     const torusA = new THREE.Mesh(new THREE.TorusKnotGeometry(2.45, 0.025, 260, 12, 2, 5), torusMaterial);
     const torusB = new THREE.Mesh(new THREE.TorusGeometry(3.05, 0.018, 10, 220), torusMaterial.clone());
-    (torusB.material as THREE.MeshStandardMaterial).color.setHex(0x78c7d4);
-    (torusB.material as THREE.MeshStandardMaterial).emissive.setHex(0x24545f);
+    (torusB.material as THREE.MeshStandardMaterial).color.setHex(0x0b93b8);
+    (torusB.material as THREE.MeshStandardMaterial).emissive.setHex(0x0a2f38);
     torusB.rotation.x = Math.PI / 2.8;
     coreGroup.add(torusA, torusB);
 
-    const logoTexture = new THREE.TextureLoader().load('/logo_mark_light.webp');
+    const logoTexture = new THREE.TextureLoader().load('/logo_mark.webp');
     logoTexture.colorSpace = THREE.SRGBColorSpace;
     const logoPlane = new THREE.Mesh(
       new THREE.PlaneGeometry(1.15, 1.15),
@@ -168,7 +168,7 @@ export default function VoidScene() {
       starPositions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
       starPositions[i + 2] = radius * Math.cos(phi) - 14;
 
-      color.setHSL([0.52, 0.12, 0.09, 0.68][index % 4], 0.72, 0.58);
+      color.setHSL([0.58, 0.1, 0.52, 0.68][index % 4], 0.55, 0.3);
       starColors[i] = color.r;
       starColors[i + 1] = color.g;
       starColors[i + 2] = color.b;
@@ -185,9 +185,9 @@ export default function VoidScene() {
         map: createParticleTexture(),
         vertexColors: true,
         transparent: true,
-        opacity: 0.86,
+        opacity: 0.5,
         depthWrite: false,
-        blending: THREE.AdditiveBlending
+        blending: THREE.NormalBlending
       })
     );
     scene.add(stars);
