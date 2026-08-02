@@ -4,6 +4,7 @@ import VoidScene from './VoidScene';
 import CursorAura from './CursorAura';
 import { TransitionLink } from '../lib/transition';
 import { useInteractions } from '../hooks/useInteractions';
+import { useLightning } from '../hooks/useLightning';
 
 const NAV: Array<{ to: string; label: string }> = [
   { to: '/', label: 'Главная' },
@@ -31,6 +32,7 @@ const PAGE_KEYS: Record<string, string> = {
 export default function Layout({ children }: { children: ReactNode }) {
   const location = useLocation();
   useInteractions();
+  useLightning();
 
   useEffect(() => {
     document.title = TITLES[location.pathname] ?? 'YeahAyat';
@@ -42,6 +44,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <VoidScene />
       <div className="noise-layer" aria-hidden="true" />
       <div className="scan-layer" aria-hidden="true" />
+      <div className="storm-flash" aria-hidden="true" />
       <CursorAura />
 
       <div className="ya-transition" aria-hidden="true">

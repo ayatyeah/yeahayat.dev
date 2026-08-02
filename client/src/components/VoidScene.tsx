@@ -1,8 +1,14 @@
-// Фоновое небо на чистом WebGL: процедурные облака (FBM) + разряды молний.
-// Один fullscreen-треугольник, один draw call — вместо тяжёлой 3D-библиотеки.
-// Внешняя 3D-библиотека удалена из зависимостей (−120 КБ gzip в бандле).
-// Оптимизации: DPR cap, пауза при скрытой вкладке, статичный кадр при
-// prefers-reduced-motion, меньше октав шума на мобильных.
+// «Гроза» — фоновое небо на чистом WebGL: ночной грозовой фронт.
+// Три слоя объёмных облаков (FBM + domain warp), ветвящиеся молнии с двойным
+// ударом, зарницы внутри облаков, звёзды в разрывах. Один fullscreen-треугольник,
+// один draw call, без внешних 3D-библиотек.
+//
+// Синхронизация со страницей: та же детерминированная временная шкала ударов
+// считается на CPU и пишется в CSS-переменную --flash (0..1). Слой .storm-flash,
+// заголовки и логотип реагируют на вспышку одновременно с небом.
+//
+// Оптимизации: DPR cap 1.5, пауза при скрытой вкладке, меньше октав шума на
+// мобильных, статичный «спокойный» кадр при prefers-reduced-motion (u_calm).
 
 import { useEffect, useRef } from 'react';
 
@@ -18,6 +24,7 @@ uniform vec2  u_res;
 uniform float u_time;
 uniform vec2  u_mouse;   // -1..1, сглаженная
 uniform float u_scroll;  // 0..1
+uniform float u_calm;    // 1 = статичный кадр без разрядов (reduced motion)
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -45,38 +52,65 @@ float fbm(vec2 p) {
   return v;
 }
 
-// Один разряд молнии: period — период цикла в секундах, seed — уникальность.
-// Возвращает вклад света (0..~1.5) для пикселя uv.
-float bolt(vec2 uv, float period, float seed) {
-  float cycle = floor(u_time / period + seed);
-  float phase = fract(u_time / period + seed);
+// Кучевая масса: лёгкий domain warp даёт клубящиеся кромки вместо «дыма».
+float billow(vec2 p) {
+  float q = fbm(p * 0.9 + vec2(0.0, u_time * 0.006));
+  return fbm(p + vec2(1.7, 0.9) * q);
+}
 
-  // Вспышка живёт первые ~22% цикла: резкий пик, быстрый спад, мерцание.
-  if (phase > 0.24) return 0.0;
-  float env = exp(-phase * 16.0) * (0.72 + 0.28 * noise(vec2(u_time * 34.0, cycle)));
+// Параметры удара: env — огибающая вспышки (двойной удар + мерцание),
+// rootX — где бьёт, cyc — номер цикла (для уникальной траектории).
+float strikeEnv(float period, float seed, out float rootX, out float cyc) {
+  cyc = floor(u_time / period + seed);
+  float ph = fract(u_time / period + seed);
+  rootX = 0.14 + 0.72 * hash(vec2(cyc, seed * 7.31));
+  if (ph > 0.3 || u_calm > 0.5) return 0.0;
+  float flick = 0.72 + 0.28 * noise(vec2(u_time * 36.0, cyc));
+  // основной пик + повторный разряд через ~85 мс — как у настоящей молнии
+  float e = exp(-ph * 20.0) + 0.55 * exp(-abs(ph - 0.085) * 36.0);
+  return e * flick;
+}
 
-  // Корень удара и глубина (до какой высоты бьёт).
-  float rootX = 0.18 + 0.64 * hash(vec2(cycle, seed * 7.31));
-  float depth = 0.5 + 0.38 * hash(vec2(cycle * 3.7, seed));
+// Свет самого канала: ломаный ствол + две ветви. dx считается в «вертикальных»
+// единицах (умножен на aspect), чтобы толщина не зависела от ширины экрана.
+float boltLight(vec2 uv, float aspect, float rootX, float cyc) {
+  float depth = 0.56 + 0.34 * hash(vec2(cyc * 3.7, rootX));
 
-  // Ломаная траектория: смещение по шуму, растёт с глубиной.
-  float wob = (noise(vec2(uv.y * 6.5, cycle * 13.7)) - 0.5) * 0.34 * (0.25 + uv.y)
-            + (noise(vec2(uv.y * 23.0, cycle * 31.1)) - 0.5) * 0.06;
+  float wob = (noise(vec2(uv.y * 5.5, cyc * 13.7)) - 0.5) * 0.36 * (0.2 + uv.y)
+            + (noise(vec2(uv.y * 21.0, cyc * 29.1)) - 0.5) * 0.07;
   float px = rootX + wob;
 
-  float d = abs(uv.x - px);
-  float reach = smoothstep(depth, depth - 0.12, uv.y);
+  float dx = abs(uv.x - px) * aspect;
+  float reach = smoothstep(depth, depth - 0.14, uv.y);
 
-  float core = exp(-d * 220.0) * 1.2;
-  float glow = exp(-d * 26.0) * 0.42;
+  float core = exp(-dx * 150.0) * 1.7;   // белое ядро
+  float glow = exp(-dx * 20.0) * 0.5;    // электрический ореол
+  float halo = exp(-dx * 5.0)  * 0.16;   // широкое свечение воздуха
 
-  // Ветка: короче, тоньше, со своим изломом.
-  float bx = px + (noise(vec2(uv.y * 11.0, cycle * 53.3)) - 0.5) * 0.22 + (uv.y - 0.2) * 0.12;
-  float bd = abs(uv.x - bx);
-  float branch = (exp(-bd * 260.0) * 0.7 + exp(-bd * 40.0) * 0.2)
-               * smoothstep(depth * 0.6, depth * 0.6 - 0.1, uv.y);
+  // Ветвь 1 — уходит вправо-вниз, короче ствола.
+  float b1x = px + (noise(vec2(uv.y * 9.0, cyc * 53.3)) - 0.5) * 0.3 + (uv.y - 0.16) * 0.17;
+  float b1d = abs(uv.x - b1x) * aspect;
+  float b1 = (exp(-b1d * 190.0) * 0.9 + exp(-b1d * 30.0) * 0.22)
+           * smoothstep(depth * 0.62, depth * 0.62 - 0.1, uv.y)
+           * step(0.12, uv.y);
 
-  return (core + glow + branch) * reach * env;
+  // Ветвь 2 — влево, ещё короче.
+  float b2x = px + (noise(vec2(uv.y * 12.0, cyc * 71.7)) - 0.5) * 0.26 - (uv.y - 0.1) * 0.14;
+  float b2d = abs(uv.x - b2x) * aspect;
+  float b2 = (exp(-b2d * 210.0) * 0.7 + exp(-b2d * 34.0) * 0.16)
+           * smoothstep(depth * 0.45, depth * 0.45 - 0.09, uv.y)
+           * step(0.1, uv.y);
+
+  return (core + glow + halo) * reach + b1 + b2;
+}
+
+// Зарница — рассеянная вспышка внутри облака без видимого канала.
+float sheet(float period, float seed, out float sx) {
+  float cyc = floor(u_time / period + seed);
+  float ph = fract(u_time / period + seed);
+  sx = 0.1 + 0.8 * hash(vec2(cyc, seed * 3.17));
+  if (ph > 0.16 || u_calm > 0.5) return 0.0;
+  return exp(-ph * 30.0) * (0.6 + 0.4 * noise(vec2(u_time * 30.0, cyc)));
 }
 
 void main() {
@@ -84,59 +118,117 @@ void main() {
   uv.y = 1.0 - uv.y; // 0 — верх экрана
   float aspect = u_res.x / u_res.y;
 
-  // --- Небо: светлый градиент в палитре сайта ---
-  vec3 top = vec3(0.835, 0.865, 0.955);
-  vec3 bottom = vec3(0.965, 0.975, 0.995);
-  vec3 col = mix(top, bottom, smoothstep(0.0, 1.0, uv.y));
+  // --- Небо: грозовой вечер, от зенита к тёплому натриевому горизонту ---
+  vec3 zenith  = vec3(0.012, 0.020, 0.047);
+  vec3 mid     = vec3(0.038, 0.060, 0.125);
+  vec3 horizon = vec3(0.085, 0.115, 0.235);
+  vec3 col = mix(zenith, mid, smoothstep(0.0, 0.55, uv.y));
+  col = mix(col, horizon, smoothstep(0.5, 1.0, uv.y));
+  // тёплая дымка города у самого горизонта
+  col += vec3(0.16, 0.09, 0.05) * pow(1.0 - uv.y, 4.0) * 0.55;
 
-  // лёгкая подкраска у горизонта
-  col += vec3(0.045, 0.03, 0.0) * (1.0 - uv.y) * 0.35;
+  // --- Разряды: тайминги нужны и небу, и облакам ---
+  float rootA; float cycA; float envA = strikeEnv(7.0, 0.37, rootA, cycA);
+  float rootB; float cycB; float envB = strikeEnv(11.0, 0.81, rootB, cycB);
+  float sxA; float shA = sheet(4.7, 0.53, sxA);
+  float sxB; float shB = sheet(6.3, 0.17, sxB);
 
-  // --- Облака: два слоя с параллаксом от мыши и скролла ---
-  vec2 wind = vec2(u_time * 0.014, 0.0);
-  vec2 par = u_mouse * vec2(0.012, 0.008);
+  // подсветка воздуха от каждого источника (радиальный спад от корня удара)
+  float lampA = envA * exp(-abs(uv.x - rootA) * aspect * 1.9) * exp(-uv.y * 1.1);
+  float lampB = envB * exp(-abs(uv.x - rootB) * aspect * 1.9) * exp(-uv.y * 1.1);
+  float lampS = (shA * exp(-abs(uv.x - sxA) * aspect * 1.3)
+               + shB * exp(-abs(uv.x - sxB) * aspect * 1.3)) * smoothstep(0.8, 0.05, uv.y);
+  float lamp = lampA + lampB + lampS * 0.55;
 
-  vec2 p1 = vec2(uv.x * aspect, uv.y) * vec2(1.6, 2.9) + wind + par + vec2(0.0, u_scroll * 0.4);
-  float c1 = fbm(p1);
-  float m1 = smoothstep(0.44, 0.78, c1);
+  // --- Звёзды в разрывах облаков (маска применяется ниже) ---
+  vec2 scell = floor(uv * vec2(aspect, 1.0) * 110.0);
+  float sh = hash(scell);
+  float star = step(0.994, sh) * pow(fract(sh * 713.7), 2.0)
+             * (0.55 + 0.45 * sin(u_time * (1.0 + sh * 3.0) + sh * 40.0));
+  float starMask = smoothstep(0.6, 0.08, uv.y);
 
-  vec2 p2 = vec2(uv.x * aspect, uv.y) * vec2(3.1, 5.4) + wind * 2.1 + par * 1.7 + vec2(3.7, u_scroll * 0.7);
-  float c2 = fbm(p2);
-  float m2 = smoothstep(0.5, 0.85, c2);
+  // --- Облака: три слоя с параллаксом от мыши и скролла ---
+  vec2 wind = vec2(u_time * 0.016, 0.0);
+  vec2 par = u_mouse * vec2(0.016, 0.01);
+  float drop = u_scroll * 0.45;
 
-  // объём: нижняя кромка облаков чуть темнее
-  float shade1 = fbm(p1 + vec2(0.0, 0.14));
-  vec3 cloudLit = vec3(1.0);
-  vec3 cloudShadow = vec3(0.78, 0.81, 0.9);
-  vec3 cloud1 = mix(cloudShadow, cloudLit, smoothstep(-0.12, 0.3, c1 - shade1) * 0.8 + 0.2);
+  // 1. Высокий тёмный потолок фронта — крупный, медленный.
+  vec2 pH = vec2(uv.x * aspect, uv.y) * vec2(1.15, 2.1) + wind * 0.6 + par * 0.7 + vec2(0.0, drop * 0.6);
+  float cH = billow(pH);
+  float mH = smoothstep(0.38, 0.78, cH) * smoothstep(0.85, 0.25, uv.y);
 
-  col = mix(col, cloud1, m1 * 0.82);
-  col = mix(col, cloudLit, m2 * 0.38);
+  // 2. Главная кучевая масса.
+  vec2 pM = vec2(uv.x * aspect, uv.y) * vec2(1.9, 3.4) + wind + par + vec2(4.2, drop);
+  float cM = billow(pM);
+  float mM = smoothstep(0.42, 0.8, cM) * smoothstep(0.95, 0.2, uv.y);
 
-  // --- Молнии: два независимых разряда ---
-  float l1 = bolt(vec2(uv.x, uv.y), 9.0, 0.37);
-  float l2 = bolt(vec2(uv.x, uv.y), 13.0, 0.81);
-  float l = l1 + l2;
+  // 3. Низкие быстрые клочья.
+  vec2 pL = vec2(uv.x * aspect, uv.y) * vec2(3.4, 5.6) + wind * 2.3 + par * 1.6 + vec2(9.1, drop * 1.4);
+  float cL = fbm(pL);
+  float mL = smoothstep(0.52, 0.88, cL) * smoothstep(1.0, 0.35, uv.y);
 
-  vec3 boltCol = mix(vec3(0.28, 0.38, 0.92), vec3(0.5, 0.36, 0.98), uv.y); // индиго -> фиолет
-  col += boltCol * l;
+  // Объём: сравниваем плотность с чуть смещённой выборкой — верхние кромки
+  // ловят холодный свет, низ уходит в тень.
+  float liftM = cM - billow(pM + vec2(0.0, 0.16));
+  float liftH = cH - billow(pH + vec2(0.0, 0.14));
 
-  // общий отсвет неба во время удара
-  float flashEnv = 0.0;
-  {
-    float ph1 = fract(u_time / 9.0 + 0.37);
-    float ph2 = fract(u_time / 13.0 + 0.81);
-    if (ph1 < 0.24) flashEnv += exp(-ph1 * 16.0);
-    if (ph2 < 0.24) flashEnv += exp(-ph2 * 16.0);
-  }
-  col += vec3(0.32, 0.34, 0.6) * flashEnv * 0.05 * (1.0 - uv.y * 0.6);
+  vec3 cloudDeep = vec3(0.030, 0.043, 0.086); // грозовое брюхо
+  vec3 cloudBody = vec3(0.075, 0.098, 0.168);
+  vec3 cloudRim  = vec3(0.40, 0.47, 0.68);    // лунно-серебристая кромка
+
+  vec3 cH_col = mix(cloudDeep, cloudBody, smoothstep(-0.1, 0.28, liftH));
+  vec3 cM_col = mix(cloudDeep, cloudBody, smoothstep(-0.12, 0.26, liftM));
+  cM_col = mix(cM_col, cloudRim, smoothstep(0.14, 0.4, liftM) * 0.55);
+
+  // Вспышка освещает облака изнутри — молочно-электрический свет.
+  vec3 flashTint = vec3(0.72, 0.84, 1.15);
+  cH_col += flashTint * lamp * (0.55 + 0.45 * smoothstep(-0.1, 0.3, liftH));
+  cM_col += flashTint * lamp * (0.7 + 0.5 * smoothstep(-0.1, 0.3, liftM));
+  vec3 cL_col = cloudBody * 0.85 + flashTint * lamp * 0.5;
+
+  // звёзды видны только там, где нет облаков
+  float cover = clamp(mH + mM + mL, 0.0, 1.0);
+  col += vec3(0.72, 0.82, 1.0) * star * starMask * (1.0 - cover) * 0.6;
+
+  col = mix(col, cH_col, mH * 0.9);
+  col = mix(col, cM_col, mM * 0.94);
+  col = mix(col, cL_col, mL * 0.5);
+
+  // общий отсвет воздуха между облаками
+  col += flashTint * lamp * 0.10;
+
+  // --- Каналы молний: рисуются поверх облаков (разряд ближе к зрителю) ---
+  float light = 0.0;
+  if (envA > 0.001) light += boltLight(uv, aspect, rootA, cycA) * envA;
+  if (envB > 0.001) light += boltLight(uv, aspect, rootB, cycB) * envB;
+
+  vec3 boltCol = mix(vec3(0.62, 0.92, 1.15), vec3(0.72, 0.60, 1.15), uv.y); // volt -> arc
+  col += boltCol * light;
+  col += vec3(1.0) * light * light * 0.22; // пересвет ядра до белого
+
+  // мягкое виньетирование к низу, чтобы контент читался
+  col *= 1.0 - smoothstep(0.55, 1.0, uv.y) * 0.22;
 
   // дизеринг против полос градиента
-  col += (hash(gl_FragCoord.xy) - 0.5) * 0.008;
+  col += (hash(gl_FragCoord.xy + fract(u_time)) - 0.5) * 0.012;
 
   gl_FragColor = vec4(col, 1.0);
 }
 `;
+
+// Та же временная шкала на CPU — для CSS-переменной --flash.
+function flashAt(timeSec: number): number {
+  const gen = (period: number, seed: number, win: number, k: number, second: boolean) => {
+    const ph = (timeSec / period + seed) % 1;
+    if (ph > win) return 0;
+    let e = Math.exp(-ph * k);
+    if (second) e += 0.55 * Math.exp(-Math.abs(ph - 0.085) * 36.0);
+    return e;
+  };
+  const strikes = gen(7.0, 0.37, 0.3, 20, true) + gen(11.0, 0.81, 0.3, 20, true);
+  const sheets = gen(4.7, 0.53, 0.16, 30, false) + gen(6.3, 0.17, 0.16, 30, false);
+  return Math.min(1, strikes * 0.62 + sheets * 0.3);
+}
 
 function compile(gl: WebGLRenderingContext, type: number, src: string) {
   const shader = gl.createShader(type)!;
@@ -189,13 +281,16 @@ export default function VoidScene() {
     const uTime = gl.getUniformLocation(program, 'u_time');
     const uMouse = gl.getUniformLocation(program, 'u_mouse');
     const uScroll = gl.getUniformLocation(program, 'u_scroll');
+    const uCalm = gl.getUniformLocation(program, 'u_calm');
 
+    const root = document.documentElement;
     const mouse = { x: 0, y: 0 };
     const target = { x: 0, y: 0 };
     let scroll = 0;
     let targetScroll = 0;
     let rafId = 0;
     let running = true;
+    let lastFlash = -1;
     const start = performance.now();
 
     const resize = () => {
@@ -215,11 +310,12 @@ export default function VoidScene() {
       targetScroll = window.scrollY / max;
     };
 
-    const draw = (timeSec: number) => {
+    const draw = (timeSec: number, calm: number) => {
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, timeSec);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
       gl.uniform1f(uScroll, scroll);
+      gl.uniform1f(uCalm, calm);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
@@ -228,7 +324,16 @@ export default function VoidScene() {
       mouse.x += (target.x - mouse.x) * 0.05;
       mouse.y += (target.y - mouse.y) * 0.05;
       scroll += (targetScroll - scroll) * 0.07;
-      draw((performance.now() - start) / 1000);
+      const t = (performance.now() - start) / 1000;
+      draw(t, 0);
+
+      // Вспышка для интерфейса: пишем только заметные изменения.
+      const f = flashAt(t);
+      if (Math.abs(f - lastFlash) > 0.02 || (f === 0 && lastFlash !== 0)) {
+        lastFlash = f;
+        root.style.setProperty('--flash', f.toFixed(3));
+      }
+
       rafId = requestAnimationFrame(tick);
     };
 
@@ -246,7 +351,8 @@ export default function VoidScene() {
     onScroll();
 
     if (reduced) {
-      draw(3.0); // один спокойный кадр с облаками, без молний
+      draw(12.0, 1); // один спокойный кадр: облака и звёзды, без разрядов
+      root.style.setProperty('--flash', '0');
     } else {
       rafId = requestAnimationFrame(tick);
     }
@@ -258,6 +364,7 @@ export default function VoidScene() {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('scroll', onScroll);
       document.removeEventListener('visibilitychange', onVisibility);
+      root.style.setProperty('--flash', '0');
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
