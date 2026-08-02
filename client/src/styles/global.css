@@ -1566,6 +1566,7 @@ body.is-routing a[data-nav-link="true"] {
 }
 
 .case-body {
+  flex: 1; /* тянем тело на всю высоту карточки — кнопки встают в одну линию */
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
@@ -1585,8 +1586,9 @@ body.is-routing a[data-nav-link="true"] {
 }
 
 .case-body .project-link {
-  margin-top: 0.35rem;
-  align-self: flex-start;
+  margin-top: auto; /* auto-отступ прижимает кнопку к низу независимо от длины текста */
+  align-self: stretch;
+  width: 100%;
 }
 
 /* --- Лайтбокс --- */
@@ -1885,4 +1887,113 @@ body.is-routing a[data-nav-link="true"] {
 .lightbox-page::before {
   content: "· ";
   opacity: 0.5;
+}
+
+/* ============================================================
+   v3 — «Гроза II»: статичные молнии-декор
+   Небо даёт динамику, эти элементы держат электричество в UI
+   постоянно. Все разряды нарисованы инлайн-SVG (0 запросов).
+   Во время удара в небе (--flash) вены и разделители вспыхивают.
+   ============================================================ */
+
+/* --- Застывшие молнии-вены по краям экрана --- */
+.bolt-veins {
+  position: fixed;
+  inset: 0;
+  z-index: 0; /* над небом, под дождём и контентом */
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background-repeat: no-repeat, no-repeat;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 900'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M118 0L96 88L128 176L100 260L134 356L104 452L130 548L102 640L124 736L108 830L116 900' stroke='%239a80ff' stroke-width='11' opacity='.10'/%3E%3Cpath d='M118 0L96 88L128 176L100 260L134 356L104 452L130 548L102 640L124 736L108 830L116 900' stroke='%2386f0ff' stroke-width='4.5' opacity='.34'/%3E%3Cpath d='M118 0L96 88L128 176L100 260L134 356L104 452L130 548L102 640L124 736L108 830L116 900' stroke='%23eaf6ff' stroke-width='1.5' opacity='.92'/%3E%3Cpath d='M128 176L174 240L158 306M104 452L58 512L72 566M124 736L162 788' stroke='%2386f0ff' stroke-width='2.6' opacity='.3'/%3E%3Cpath d='M128 176L174 240L158 306M104 452L58 512L72 566M124 736L162 788' stroke='%23eaf6ff' stroke-width='1' opacity='.75'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 760'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M74 0L102 74L70 150L110 236L84 318L118 404L88 486L114 566L92 648L106 760' stroke='%239a80ff' stroke-width='11' opacity='.10'/%3E%3Cpath d='M74 0L102 74L70 150L110 236L84 318L118 404L88 486L114 566L92 648L106 760' stroke='%2386f0ff' stroke-width='4.5' opacity='.34'/%3E%3Cpath d='M74 0L102 74L70 150L110 236L84 318L118 404L88 486L114 566L92 648L106 760' stroke='%23eaf6ff' stroke-width='1.5' opacity='.92'/%3E%3Cpath d='M70 150L28 208L44 258M118 404L164 458L150 514M92 648L54 700' stroke='%2386f0ff' stroke-width='2.6' opacity='.3'/%3E%3Cpath d='M70 150L28 208L44 258M118 404L164 458L150 514M92 648L54 700' stroke='%23eaf6ff' stroke-width='1' opacity='.72'/%3E%3C/g%3E%3C/svg%3E");
+  background-position:
+    left -64px top -50px,
+    right -58px top 22%;
+  background-size: 230px auto, 190px auto;
+  opacity: calc(0.12 + var(--flash) * 0.62); /* застывший разряд оживает при ударе */
+  filter: drop-shadow(0 0 10px rgba(134, 240, 255, 0.25));
+}
+
+/* --- Разделители секций: ломаная-разряд вместо ровной линии --- */
+.section-head::after,
+.page-head::after {
+  content: "";
+  display: block;
+  height: 12px;
+  margin-top: 16px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='0 7 12 3 24 9 38 4 50 8 64 2 78 9 92 5 104 8 120 6' stroke='%2386f0ff' stroke-width='3' opacity='.32'/%3E%3Cpolyline points='0 7 12 3 24 9 38 4 50 8 64 2 78 9 92 5 104 8 120 6' stroke='%23eaf6ff' stroke-width='1.1' opacity='.9'/%3E%3C/g%3E%3C/svg%3E")
+    left center / 120px 12px repeat-x;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 5px rgba(134, 240, 255, 0.5))
+    drop-shadow(0 0 14px rgba(134, 240, 255, calc(0.15 + var(--flash) * 0.65)));
+}
+
+/* --- Мини-болт перед каждым лейблом секций и карточек --- */
+.panel-label::before {
+  content: "";
+  display: inline-block;
+  width: 11px;
+  height: 15px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 16'%3E%3Cpath d='M7.4 0 0.8 9.2h4L3.1 16l8.1-9.8H6.3z' fill='%2386f0ff'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  filter: drop-shadow(0 0 4px rgba(134, 240, 255, 0.8));
+}
+
+/* --- Заголовок кейса: при наведении под ним проступает разряд --- */
+.case-body h3::after {
+  content: "";
+  display: block;
+  height: 9px;
+  margin-top: 7px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='0 7 12 3 24 9 38 4 50 8 64 2 78 9 92 5 104 8 120 6' stroke='%2386f0ff' stroke-width='3' opacity='.32'/%3E%3Cpolyline points='0 7 12 3 24 9 38 4 50 8 64 2 78 9 92 5 104 8 120 6' stroke='%23eaf6ff' stroke-width='1.1' opacity='.9'/%3E%3C/g%3E%3C/svg%3E")
+    left center / 96px 9px repeat-x;
+  opacity: 0;
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1);
+  filter: drop-shadow(0 0 6px rgba(134, 240, 255, 0.6));
+}
+
+.case-card:hover .case-body h3::after,
+.case-card:focus-within .case-body h3::after {
+  opacity: 0.85;
+  transform: none;
+}
+
+/* --- Цифры статистики дышат вместе с небом --- */
+.stat-value {
+  text-shadow: 0 0 calc(30px * var(--flash)) rgba(134, 240, 255, 0.9);
+}
+
+/* --- Футер отделён таким же застывшим разрядом --- */
+.footer {
+  position: relative;
+  padding-top: 30px;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1080px, 100%);
+  height: 10px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='0 7 12 3 24 9 38 4 50 8 64 2 78 9 92 5 104 8 120 6' stroke='%2386f0ff' stroke-width='3' opacity='.32'/%3E%3Cpolyline points='0 7 12 3 24 9 38 4 50 8 64 2 78 9 92 5 104 8 120 6' stroke='%23eaf6ff' stroke-width='1.1' opacity='.9'/%3E%3C/g%3E%3C/svg%3E")
+    left center / 110px 10px repeat-x;
+  opacity: 0.35;
+  filter: drop-shadow(0 0 5px rgba(134, 240, 255, 0.45));
+}
+
+/* --- Мобильный: одна вена меньшего размера, чтобы не мешать тексту --- */
+@media (max-width: 640px) {
+  .bolt-veins {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 760'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M74 0L102 74L70 150L110 236L84 318L118 404L88 486L114 566L92 648L106 760' stroke='%239a80ff' stroke-width='11' opacity='.10'/%3E%3Cpath d='M74 0L102 74L70 150L110 236L84 318L118 404L88 486L114 566L92 648L106 760' stroke='%2386f0ff' stroke-width='4.5' opacity='.34'/%3E%3Cpath d='M74 0L102 74L70 150L110 236L84 318L118 404L88 486L114 566L92 648L106 760' stroke='%23eaf6ff' stroke-width='1.5' opacity='.92'/%3E%3Cpath d='M70 150L28 208L44 258M118 404L164 458L150 514M92 648L54 700' stroke='%2386f0ff' stroke-width='2.6' opacity='.3'/%3E%3Cpath d='M70 150L28 208L44 258M118 404L164 458L150 514M92 648L54 700' stroke='%23eaf6ff' stroke-width='1' opacity='.72'/%3E%3C/g%3E%3C/svg%3E");
+    background-position: right -74px top 12%;
+    background-size: 150px auto;
+    opacity: calc(0.09 + var(--flash) * 0.55);
+  }
 }

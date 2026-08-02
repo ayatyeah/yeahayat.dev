@@ -130,15 +130,19 @@ void main() {
   // --- Разряды: тайминги нужны и небу, и облакам ---
   float rootA; float cycA; float envA = strikeEnv(7.0, 0.37, rootA, cycA);
   float rootB; float cycB; float envB = strikeEnv(11.0, 0.81, rootB, cycB);
+  float rootC; float cycC; float envC = strikeEnv(5.3, 0.61, rootC, cycC);
   float sxA; float shA = sheet(4.7, 0.53, sxA);
   float sxB; float shB = sheet(6.3, 0.17, sxB);
+  float sxC; float shC = sheet(8.9, 0.29, sxC);
 
   // подсветка воздуха от каждого источника (радиальный спад от корня удара)
   float lampA = envA * exp(-abs(uv.x - rootA) * aspect * 1.9) * exp(-uv.y * 1.1);
   float lampB = envB * exp(-abs(uv.x - rootB) * aspect * 1.9) * exp(-uv.y * 1.1);
+  float lampC = envC * exp(-abs(uv.x - rootC) * aspect * 1.9) * exp(-uv.y * 1.1);
   float lampS = (shA * exp(-abs(uv.x - sxA) * aspect * 1.3)
-               + shB * exp(-abs(uv.x - sxB) * aspect * 1.3)) * smoothstep(0.8, 0.05, uv.y);
-  float lamp = lampA + lampB + lampS * 0.55;
+               + shB * exp(-abs(uv.x - sxB) * aspect * 1.3)
+               + shC * exp(-abs(uv.x - sxC) * aspect * 1.3)) * smoothstep(0.8, 0.05, uv.y);
+  float lamp = lampA + lampB + lampC + lampS * 0.55;
 
   // --- Звёзды в разрывах облаков (маска применяется ниже) ---
   vec2 scell = floor(uv * vec2(aspect, 1.0) * 110.0);
@@ -201,6 +205,7 @@ void main() {
   float light = 0.0;
   if (envA > 0.001) light += boltLight(uv, aspect, rootA, cycA) * envA;
   if (envB > 0.001) light += boltLight(uv, aspect, rootB, cycB) * envB;
+  if (envC > 0.001) light += boltLight(uv, aspect, rootC, cycC) * envC;
 
   vec3 boltCol = mix(vec3(0.62, 0.92, 1.15), vec3(0.72, 0.60, 1.15), uv.y); // volt -> arc
   col += boltCol * light;
@@ -225,8 +230,8 @@ function flashAt(timeSec: number): number {
     if (second) e += 0.55 * Math.exp(-Math.abs(ph - 0.085) * 36.0);
     return e;
   };
-  const strikes = gen(7.0, 0.37, 0.3, 20, true) + gen(11.0, 0.81, 0.3, 20, true);
-  const sheets = gen(4.7, 0.53, 0.16, 30, false) + gen(6.3, 0.17, 0.16, 30, false);
+  const strikes = gen(7.0, 0.37, 0.3, 20, true) + gen(11.0, 0.81, 0.3, 20, true) + gen(5.3, 0.61, 0.3, 20, true);
+  const sheets = gen(4.7, 0.53, 0.16, 30, false) + gen(6.3, 0.17, 0.16, 30, false) + gen(8.9, 0.29, 0.16, 30, false);
   return Math.min(1, strikes * 0.62 + sheets * 0.3);
 }
 
@@ -293,8 +298,16 @@ export default function VoidScene() {
     let lastFlash = -1;
     const start = performance.now();
 
+    // Адаптивное качество: если кадры не успевают, снижаем разрешение
+    // рендера (CSS растянет канвас — гроза остаётся, нагрузка падает).
+    const QUALITY_STEPS = [1.5, 1.2, 1.0, 0.8];
+    let quality = 0;
+    let frameEma = 16;
+    let frameCount = 0;
+    let lastTickAt = 0;
+
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, QUALITY_STEPS[quality]);
       canvas.width = Math.round(window.innerWidth * dpr);
       canvas.height = Math.round(window.innerHeight * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -321,10 +334,28 @@ export default function VoidScene() {
 
     const tick = () => {
       if (!running) return;
+      const now = performance.now();
+      const dt = lastTickAt ? now - lastTickAt : 16;
+      lastTickAt = now;
+      if (dt < 100) {
+        // фильтруем скачки после разворота вкладки
+        frameEma = frameEma * 0.9 + dt * 0.1;
+        frameCount++;
+        if (frameCount >= 90) {
+          frameCount = 0;
+          if (frameEma > 21 && quality < QUALITY_STEPS.length - 1) {
+            quality++;
+            resize();
+          } else if (frameEma < 13.5 && quality > 0) {
+            quality--;
+            resize();
+          }
+        }
+      }
       mouse.x += (target.x - mouse.x) * 0.05;
       mouse.y += (target.y - mouse.y) * 0.05;
       scroll += (targetScroll - scroll) * 0.07;
-      const t = (performance.now() - start) / 1000;
+      const t = (now - start) / 1000;
       draw(t, 0);
 
       // Вспышка для интерфейса: пишем только заметные изменения.
@@ -339,6 +370,7 @@ export default function VoidScene() {
 
     const onVisibility = () => {
       running = !document.hidden;
+      lastTickAt = 0;
       if (running && !reduced) rafId = requestAnimationFrame(tick);
     };
 

@@ -247,6 +247,11 @@ export function useLightning() {
 
     // --- Фоновые искры: сайт «под напряжением» даже без курсора ---
     const ambient = () => {
+      // фоновая вкладка — не жжём батарею, просто ждём
+      if (document.hidden) {
+        ambientTimer = window.setTimeout(ambient, 1500);
+        return;
+      }
       const all = Array.from(document.querySelectorAll<HTMLElement>(SELECTOR)).filter((el) => {
         const r = el.getBoundingClientRect();
         return r.width > 0 && r.bottom > 0 && r.top < window.innerHeight;
@@ -256,13 +261,21 @@ export function useLightning() {
         if (el !== hovered) {
           const rect = el.getBoundingClientRect();
           bolts.push(edgeArc(rect));
-          if (Math.random() < 0.35) bolts.push(edgeArc(rect));
+          if (Math.random() < 0.4) bolts.push(edgeArc(rect));
           wake();
         }
+        // грозовой фронт: иногда пробивает сразу вторую кнопку
+        if (all.length > 1 && Math.random() < 0.3) {
+          const other = all[Math.floor(Math.random() * all.length)];
+          if (other !== el && other !== hovered) {
+            bolts.push(edgeArc(other.getBoundingClientRect()));
+            wake();
+          }
+        }
       }
-      ambientTimer = window.setTimeout(ambient, rand(1500, 3200));
+      ambientTimer = window.setTimeout(ambient, rand(900, 2100));
     };
-    ambientTimer = window.setTimeout(ambient, 900);
+    ambientTimer = window.setTimeout(ambient, 700);
 
     window.addEventListener('resize', resize);
     document.addEventListener('pointerover', onOver, { passive: true });
