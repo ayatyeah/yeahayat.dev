@@ -111,7 +111,7 @@ export default function WaterJournal({ children }: { children: ReactNode }) {
     const inView = new IntersectionObserver(entries => {
       for (const entry of entries) entry.target.toggleAttribute('data-in-view', entry.isIntersecting);
     });
-    journal.querySelectorAll('.business-intro,.service-workbench,.home-cases .archive-banner,.project-archive,.sun-lab')
+    journal.querySelectorAll('.business-intro,.service-workbench,.home-cases .archive-banner,.project-archive,.edition-case,.sun-lab')
       .forEach(el => inView.observe(el));
     const resize = new ResizeObserver(queueMeasure);
     resize.observe(journal.parentElement ?? journal);

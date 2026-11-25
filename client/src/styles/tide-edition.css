@@ -303,8 +303,8 @@ html:has(body[data-page=home]) {scroll-behavior:auto;}
   .letter-note > div {grid-row:1;}
 }
 @media(prefers-reduced-motion:no-preference) {
-  .water-art[data-fallback=true] .water-fallback [data-docked] i {animation:water-glyph-orbit 21s .8s linear infinite;}
-  @keyframes water-glyph-orbit {to {transform:rotateY(1turn);}}
+  .water-art[data-fallback=true] .water-fallback i {animation:water-glyph-bank 7s ease-in-out infinite alternate;animation-delay:calc(var(--index) * -1.3s);}
+  @keyframes water-glyph-bank {from {transform:rotateY(-23deg) rotate(-3deg);}to {transform:rotateY(28deg) rotate(3deg);}}
   .ocean-backdrop:not(:has(.ocean-surface[data-active=true])) .ocean-column img {
     animation:ocean-poster-drift 15s ease-in-out infinite alternate;
   }

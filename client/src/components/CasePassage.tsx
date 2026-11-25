@@ -16,13 +16,15 @@ export default function CasePassage() {
     const book=cases.querySelector<HTMLElement>('.folio-desk')!;
     const target=cases.querySelector<HTMLElement>('#case-yeahgrind .edition-screen')!;
     const cover=cases.querySelector<HTMLButtonElement>('.case-folio')!;
-    const bookIcon=cases.querySelector<HTMLElement>('#case-yeahgrind .water-figure')!;
+    const firstCase=target.closest('article')!;
     const wheat=cases.querySelector<HTMLElement>('#case-shmagro .water-figure')!;
     const leaf=overlay.querySelector<HTMLElement>('.passage-leaf')!;
     const ray=overlay.querySelector<SVGPathElement>('.passage-ray')!;
     const line=overlay.querySelector<SVGPathElement>('.passage-filament')!;
+    const current=overlay.querySelector<SVGPathElement>('.passage-current')!;
     const glint=overlay.querySelector<SVGGElement>('.passage-glint')!;
     let rayPoints: DOMPoint[]=[];
+    const beads=[...overlay.querySelectorAll<SVGCircleElement>('.passage-bead')];
     const reduce=matchMedia('(prefers-reduced-motion: reduce)');
     let frame=0, top=0, height=0, width=0;
     let source={x:0,y:0,w:0,h:0}, dest={...source}, stem=0, spine=0;
@@ -47,6 +49,7 @@ export default function CasePassage() {
           const w=lerp(source.w,dest.w,turn), h=lerp(source.h,dest.h,turn);
           leaf.style.transform='translate3d('+x+'px,'+y+'px,0) rotate('+lerp(-7,0,turn)+'deg) scale('+w/dest.w+','+h/dest.h+')';
           leaf.style.opacity=String(alpha);
+          leaf.style.setProperty('--lift',String(Math.sin(Math.PI*travel)**2));
           leaf.style.setProperty('--hinge',(cover.getAttribute('aria-pressed')==='true' ? -145-turn*23 : -22-turn*146)+'deg');
           leaf.style.setProperty('--cover-alpha',String(1-ease(clamp((t-.55)/.35))));
           cover.style.setProperty('--book-visible',String(1-clamp(t/.085)));
@@ -66,10 +69,17 @@ export default function CasePassage() {
           const f=index%1;
           glint.setAttribute('transform','translate('+lerp(head.x,next.x,f)+' '+lerp(head.y,next.y,f)+')');
         }
+        beads.forEach((bead,i)=>{
+          const tail=rayPoints[Math.max(0,Math.floor(index)-3*(i+1))];
+          if(tail){bead.setAttribute('cx',String(tail.x));bead.setAttribute('cy',String(tail.y));}
+          bead.style.opacity=String(alpha*(.7-i*.15));
+        });
         glint.style.opacity=String(alpha);
+        overlay.toggleAttribute('data-flowing',alpha>0);
+        current.style.opacity=String(alpha*.85);
         ray.style.opacity=String(alpha);
         ray.style.strokeDashoffset=String(.09-1.09*beam);
-        line.style.opacity=String(.28*alpha);
+        line.style.opacity=String(.52*alpha);
         wheat.style.setProperty('--arrival-tilt',(Math.sin(clamp((beam-.76)/.24)*Math.PI*2)*-12*alpha)+'deg');
       }
     }
@@ -83,11 +93,21 @@ export default function CasePassage() {
       }
       source=box(book); dest=box(target);
       leaf.style.width=dest.w+'px';leaf.style.height=dest.h+'px';
-      const a=box(bookIcon.querySelector('canvas')!), b=box(wheat.querySelector('canvas')!);
-      spine=a.y; stem=b.y;
-      const gutter=width-Math.max(16,width*.039);
-      const d='M '+a.x+' '+a.y+' C '+(a.x+64)+' '+(a.y+48)+' '+gutter+' '+(a.y+15)+' '+gutter+' '+(a.y+(b.y-a.y)*.34)+' S '+gutter+' '+(b.y-26)+' '+b.x+' '+b.y;
-      ray.setAttribute('d',d);line.setAttribute('d',d);
+      // A drop beads on the landed print, runs along its margin, then
+      // crosses the space between spreads and feeds the ear of wheat.
+      const a={x:dest.x+dest.w*.48,y:dest.y+dest.h*.12};
+      const ear=box(wheat);
+      const b={x:ear.x,y:ear.y-ear.h*.19};
+      spine=dest.y; stem=b.y;
+      const gutter=width-Math.max(12,width*.033);
+      const boundary=firstCase.getBoundingClientRect().bottom-bounds.top;
+      const across=width>700;
+      const joint=across ? boundary : a.y+(b.y-a.y)*.58;
+      const bend=across ? b.x+ear.w*.34 : gutter;
+      const d=`M ${a.x} ${a.y} C ${gutter} ${a.y+8} ${gutter} ${a.y+24} ${gutter} ${(a.y+joint)/2}
+        C ${gutter} ${joint} ${bend} ${joint} ${bend} ${(joint+b.y)/2}
+        Q ${bend} ${b.y-12} ${b.x} ${b.y}`;
+      for(const path of [ray,line,current])path.setAttribute('d',d);
       const length=ray.getTotalLength();
       rayPoints=Array.from({length:81},(_,i)=>ray.getPointAtLength(i*length/80));
       previous=previousRay=-1;draw();
@@ -100,7 +120,7 @@ export default function CasePassage() {
       if(!reduce.matches)queue();
     }
     const resize=new ResizeObserver(queue);
-    [cases,cover,target,bookIcon,wheat].forEach(el=>resize.observe(el));
+    [cases,cover,target,firstCase,wheat].forEach(el=>resize.observe(el));
     const stop=subscribeVisualScroll(draw);
     function toggle(){queue();}
     window.addEventListener('portfolio-folio',toggle);
@@ -114,15 +134,19 @@ export default function CasePassage() {
   return <div className="case-passage" ref={layer} aria-hidden="true">
     <div className="passage-leaf"><div className="passage-page">
       <img src={screenPreview(landing,800)} srcSet={screenSources(landing)} sizes="(max-width:700px) 82vw, 44vw" loading="lazy" decoding="async" alt="" />
-      <i className="passage-cover" />
+      <i className="passage-cover" /><i className="passage-sheen" />
     </div></div>
     <svg width="100%" height="100%" focusable="false">
       <defs><radialGradient id="caustic-glow"><stop stopColor="#fffbd9"/><stop offset=".26" stopColor="#ffedaa" stopOpacity=".85"/><stop offset="1" stopColor="#76dce9" stopOpacity="0"/></radialGradient></defs>
       <path className="passage-filament" fill="none" />
+      <path className="passage-current" fill="none" strokeDasharray="1 4 5 23" />
       <path className="passage-ray" fill="none" pathLength="1" strokeDasharray=".09 1.1" />
-      <g className="passage-glint">
+      {[3.3,2.2,1.4].map(r=><circle key={r} className="passage-bead" r={r} fill="#acf3f2" stroke="#368b9b" strokeWidth=".8" />)}
+      <g className="passage-glint"><g className="passage-drop">
         <circle r="16" fill="url(#caustic-glow)"/>
-        <path d="M0 -11 Q1 -2 9 0 Q1 1 0 12 Q-1 1 -8 0 Q-1 -1 0 -11" fill="#fffce4"/>
+        <path d="M2 -11 C1 -6 -6 -2 -6 3 C-6 11 6 12 7 4 C8 0 5 -5 2 -11Z" fill="#8ddde1" stroke="#367d8c" strokeWidth="1"/>
+        <path d="M0 -4 Q-4 0 -3 3" fill="none" stroke="#fffcef" strokeWidth="1.8" strokeLinecap="round"/>
+      </g>
       </g>
     </svg>
   </div>;

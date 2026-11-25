@@ -79,12 +79,13 @@ export async function mountFigures(buttons:HTMLButtonElement[],signal:AbortSigna
       // Hinged, indexed and locking objects already have two stable poses.
       const hold=reduced.matches && obj.toggle===1 &&
         !book && button.dataset.waterFigure!=='ddc' && button.dataset.waterFigure!=='blcsoftsale';
-      obj.model.animate(hold ? .22 : t,obj.state,obj.turn);
+      obj.model.animate(hold ? .22 : t,obj.state,obj.turn,time);
       obj.scroll=reduced.matches?0:T.MathUtils.damp(obj.scroll,obj.targetScroll,7,dt);
       moving ||= t < 1 || Math.abs(obj.scroll-obj.targetScroll)>.01;
       pivot.visible=true;
       pivot.rotation.set(.09*Math.sin(time*.78)-obj.scroll*.12,.16+.18*Math.sin(time*.72)+obj.scroll*.32,.032*Math.sin(time));
       pivot.position.y=.035*Math.sin(time*.85)+obj.scroll*.085;
+      uniforms.backingTransmission.value=button.dataset.waterFigure==='shmagro' ? 1 : 0;
       uniforms.age.value=reduced.matches || book ? -1 : age;
       const pixels=Math.max(1,Math.min(256,Math.ceil((widths.get(button) || 96)*Math.min(devicePixelRatio,1.5))));
       if(pixels>bufferSize){

@@ -126,9 +126,8 @@ export default function WaterScene({ name, introduction, discuss }: { name: stri
           glyph.style.setProperty('--glyph-alpha', String(1 - pose.enter*smooth((Math.abs(distance)-.32)/.64)));
           glyph.style.setProperty('--glyph-offset', String(Math.max(-1,Math.min(1,distance))));
           const tilt = Math.max(-1,Math.min(1,phase-i));
-          const turn = tilt < 0 ? -Math.pow(-tilt,2.35) : tilt;
-          glyph.style.setProperty('--glyph-angle', (turn*210*pose.enter)+'deg');
-          glyph.toggleAttribute('data-docked', pose.enter>.94 && Math.abs(distance)<.32);
+          const turn = tilt * (44 + 83*smooth((Math.abs(tilt)-.56)/.44));
+          glyph.style.setProperty('--glyph-angle', (turn*pose.enter)+'deg');
         });
         art.style.setProperty('--letter-enter', String(pose.enter));
       }

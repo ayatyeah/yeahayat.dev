@@ -24,6 +24,7 @@ import './styles/tide-edition.css';
 import './styles/folio-passage.css';
 import './styles/case-edition.css';
 import './styles/case-passage.css';
+import './styles/tidal-type.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

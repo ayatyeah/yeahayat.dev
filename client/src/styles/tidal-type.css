@@ -1,0 +1,17 @@
+/* The broad counters and backslant need more room than the text face. */
+body .page-main-home {--editorial:var(--type-display);}
+.page-main-home :is(.studio-author h2,.letter-note h3,.services-ledger h3,.archive-banner h2,.project-edition .print-title h3,.sun-invitation h2),
+.page-main-home #stack .workshop-story h2,
+.page-main-home #sun-console .sun-copy h2,
+#contact-horizon #horizon-heading,
+body .page-main :is(.page-title,.archive-heading h2,.form-heading) {
+  font-family:var(--type-display);font-weight:535;letter-spacing:-.038em;line-height:1.035;
+}
+.page-main-home .letter-note h3 {max-width:15ch;}
+@media(max-width:700px){
+  .page-main-home .home-cases .archive-banner h2 {font-size:clamp(24px,6.5vw,42px);}
+}
+@media(min-width:701px){
+  .project-edition .feature-spread .edition-notes {container-type:inline-size;}
+  .project-edition .feature-spread .print-title h3 {font-size:min(6.6vw,18.6cqi,108px);}
+}

@@ -7,7 +7,7 @@ export function waterObject(kind:string, water:T.Material){
   const ownedMaterials: T.Material[] = [];
   const ownedTextures: T.Texture[] = [];
   // t runs from zero to one per gesture. state eases between two resting poses.
-  let animate: (t:number,state:number,turn:number)=>void = ()=>{};
+  let animate: (t:number,state:number,turn:number,time:number)=>void = ()=>{};
   const smooth=(t:number)=>T.MathUtils.smoothstep(t,0,1);
   const pulse=(t:number)=>smooth(t/.28)*(1-smooth((t-.40)/.60));
   const cast=(points:number[][])=>new T.Mesh(waterVolume(points.map(([x,y])=>new T.Vector3(x,y,0)),water,30),water);
@@ -170,6 +170,9 @@ export function waterObject(kind:string, water:T.Material){
   }else if(kind==='shmagro'){
     const joints:T.Group[]=[];
     const grain=cast([[-.12,-.23],[-.15,.02],[0,.25],[.15,.02],[.12,-.23],[0,-.29]]);
+    const awn=new T.TubeGeometry(new T.CatmullRomCurve3([
+      new T.Vector3(0,0,0),new T.Vector3(.067,.14,.008),new T.Vector3(.11,.33,-.01)
+    ]),6,.012,5,false);
     for(let i=0;i<4;i++){
       const joint=new T.Group();
       joint.position.y=i===0?-.77:.34;
@@ -178,17 +181,21 @@ export function waterObject(kind:string, water:T.Material){
       joint.add(rod(new T.Vector3(),new T.Vector3(0,.34,0),.046-i*.004));
       if(i>0)for(const side of [-1,1]){
         const leaf=grain.clone();
-        leaf.rotation.z=-side*.67;leaf.position.set(side*.17,.11,0);joint.add(leaf);
+        leaf.rotation.z=-side*.63;leaf.position.set(side*.17,.11,side*.028);joint.add(leaf);
+        const bristle=new T.Mesh(awn,water);
+        bristle.position.set(side*.28,.24,side*.028);
+        bristle.scale.set(side,.83+(3-i)*.085,1);
+        joint.add(bristle);
       }
     }
     grain.position.y=.37;joints[3].add(grain);
     group.rotation.z=-.12;
-    animate=t=>joints.forEach((joint,i)=>{
+    animate=(t,_state,_turn,time)=>joints.forEach((joint,i)=>{
       // A gust reaches the base first. The upper stem bows further and
       // springs through vertical after the lower joints have settled.
       const phase=Math.max(0,t-i*.048);
       const sway=Math.sin(phase*Math.PI*3.65)*Math.exp(-phase*3.25)*(1-smooth((t-.83)/.17));
-      joint.rotation.z=(.29+i*.078)*sway;
+      joint.rotation.z=(.29+i*.078)*sway + (.026+i*.009)*Math.sin(time*.95-i*.36);
       joint.rotation.x=.13*i*sway;
     });
   }else if(kind==='blcsoftsale'){

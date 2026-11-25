@@ -147,8 +147,7 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
   let pointerPending=false, pointerX=0, pointerY=0;
   let width=0, height=0, pixelRatio=0, quality=1, slowFrames=0, activeUntil=0;
   let lastQualityChange=0, lastFrameWasActive=false;
-  let settledTurns=pose.turns, lastTurns=-1, lastPoseChange=0;
-  const idleAngles=letters.map(()=>0);
+  let settledTurns=pose.turns, lastTurns=-1;
   let lastEnter=-1, lastFocus=-1, lastPassage=-1;
   const cursor=new T.Vector2(), ray=new T.Raycaster();
   const hits: T.Intersection[]=[];
@@ -275,8 +274,7 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
     }
     const {turns,enter,focus,passage}=pose;
     // Follow the finger immediately in position; let the angular motion settle separately.
-    settledTurns=T.MathUtils.damp(settledTurns,turns,4.6,dt);
-    if (turns!==lastTurns || enter!==lastEnter || focus!==lastFocus) lastPoseChange=now;
+    settledTurns=T.MathUtils.clamp(T.MathUtils.damp(settledTurns,turns,5.5,dt),turns-.12,turns+.12);
     if (reduced.matches) settledTurns=turns;
     lastTurns=turns; lastEnter=enter; lastFocus=focus; lastPassage=passage;
     const halfHeight=depth*Math.tan(T.MathUtils.degToRad(19.5));
@@ -297,32 +295,32 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
       group.visible=presence>.002;
       const ownAge=time-impacts[i][(nextImpact[i]+2)%3].w;
       const spring=ownAge<1 ? Math.sin(ownAge*23)*Math.exp(-ownAge*6)*.21 : 0;
-      group.scale.set(scale*presence*(1+spring*(i===0?1.3:.62)),scale*presence*(1-spring*(i===3?1.4:1)),scale*presence*(1+spring*.7));
+      const radius=scale*presence*(1-(portrait ? .06 : .24)*passage*enter);
+      group.scale.set(radius*(1+spring*(i===0?1.3:.62)),radius*(1-spring*(i===3?1.4:1)),radius*(1+spring*.7));
       const rest=(centerX[i]-325)/units;
       const distance=T.MathUtils.clamp(i-focus,-1,1);
       // The active glyph docks beside its text. Incoming/outgoing glyphs
       // cross in depth and height within the same left-hand column.
       const dockX=portrait ? -.62 : -.49;
       const arc=passage*(1-Math.abs(distance)*.35);
-      const chapterX=halfWidth*(dockX + distance*(portrait ? .075 : .17));
-      group.position.set(T.MathUtils.lerp(rest,chapterX,enter),
-        .020*Math.sin(time*.75+i)+enter*halfHeight*(dockY-distance*.68),
-        -enter*halfHeight*.35*Math.abs(distance));
+      const tide=time*.76+i*.93;
+      const drift=reduced.matches ? 0 : Math.sin(tide);
+      const chapterX=halfWidth*(dockX + distance*(portrait ? .065 : .14));
+      group.position.set(T.MathUtils.lerp(rest,chapterX,enter)+enter*halfWidth*.014*drift,
+        .032*drift+enter*halfHeight*(dockY-distance*(portrait ? .66 : .92)+.019*drift),
+        enter*halfHeight*(.08*Math.cos(tide)-.48*Math.abs(distance)));
       if(i===1)group.position.x+=spring*1.1;
       if(i===2 && ownAge<.7)group.position.y+=.26*Math.sin(Math.PI*ownAge/.7)**2;
       const tilt=T.MathUtils.clamp(settledTurns-i,-1,1);
-      if (!group.visible || reduced.matches) idleAngles[i]=0;
-      else if (enter>.94 && distanceFromFocus<.36) {
-        const atRest=T.MathUtils.smoothstep((now-lastPoseChange)/1000,.6,1.6);
-        idleAngles[i]=(idleAngles[i]+dt*atRest*.31)%(2*Math.PI);
-      }
-      // Stagger the two faces so they never both read edge-on halfway through.
-      const turn=tilt<0 ? -Math.pow(-tilt,2.35) : tilt;
-      const angle=enter*turn*3.67 + .62*Math.sin(enter*Math.PI) + idleAngles[i];
+      // Bank through the current while the glyph can be read. The deep part
+      // of the turn happens on its way out, behind the arriving sculpture.
+      const bank=tilt*(.76+1.45*T.MathUtils.smoothstep(Math.abs(tilt),.56,1));
+      const roll=reduced.matches ? 0 : .42*Math.sin(tide*.71)+.09*Math.sin(tide*1.38);
+      const angle=enter*(bank+roll)+.50*Math.sin(enter*Math.PI);
       group.rotation.set(
-        enter*(.13*Math.sin(angle+i)+arc*.16),
-        .095*Math.sin(time*.62+i)+angle+enter*.10*Math.sin(i),
-        .028*Math.sin(time*.7+i)+enter*(.10*Math.sin(angle*.8+i)-distance*.09)+(i===3?spring:0)
+        .06*drift+enter*(.14*Math.sin(angle+i)+arc*.14),
+        .13*drift+angle,
+        .045*drift+enter*(.095*Math.sin(tide*.68+i)-distance*.115)+(i===3?spring:0)
       );
     });
     drops.forEach(({anchor,baseY},i)=>{anchor.position.y=baseY+.027*Math.sin(time*1.1+i);});

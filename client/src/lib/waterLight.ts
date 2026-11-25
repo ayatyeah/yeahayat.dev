@@ -147,6 +147,7 @@ uniform vec2 inverseBuffer;
 uniform float hasScenePhoto;
 #endif
 
+uniform float backingTransmission;
 const float waterIOR=1.333;
 const vec3 lensAxes=vec3(1.,1.,1.2);
 
@@ -196,11 +197,16 @@ void main() {
   result+=mix(vec3(.16,.32,.39),vec3(.14,.25,.36),night)
           *meniscus*(.24+.76*max(-normal.y,0.));
   #ifdef LETTER_WAVES
+  // A broad skylight shapes the meniscus against similarly coloured water.
+  float skyBand=dot(reflect(viewRay,normal),normalize(vec3(-.42,.78,.46)));
+  result+=vec3(.38,.58,.62)*smoothstep(.71,.96,skyBand)*(.13+.61*rim);
   result+=sunTint*crestLight*(.17+.96*rim+.31*pow(sheen,8.));
   #endif
   result+=night*vec3(.17,.27,.39)*rim2;
-  gl_FragColor = vec4(result,1.);
+  float opacity=1.-backingTransmission*.63*facing*(1.-pow(sheen,12.));
+  gl_FragColor = vec4(result,opacity);
   #include <colorspace_fragment>
+  gl_FragColor.rgb *= opacity;
 }`;
 
 // CC0 Kloofendal 48d Partly Cloudy (Pure Sky), Poly Haven. The local WebP
@@ -246,7 +252,7 @@ export function createWaterLight(renderer:T.WebGLRenderer, panorama:Sky){
   const cube=new T.WebGLCubeRenderTarget(size,{type:T.HalfFloatType,depthBuffer:false,generateMipmaps:true,minFilter:T.LinearMipmapLinearFilter});
   new T.CubeCamera(.1,50,cube).update(renderer,skyScene);
   panorama.hdr?.dispose();bake.dispose();
-  const uniforms={...skyUniforms,impact:{value:new T.Vector2()},age:{value:-1},sky:{value:cube.texture},pointer:{value:new T.Vector2(0,0)},attention:{value:0}};
+  const uniforms={...skyUniforms,backingTransmission:{value:0},impact:{value:new T.Vector2()},age:{value:-1},sky:{value:cube.texture},pointer:{value:new T.Vector2(0,0)},attention:{value:0}};
   const water=new T.ShaderMaterial({uniforms,vertexShader:vertex,fragmentShader:fragment});
   return {water,uniforms,dispose(){
     cube.dispose();geometry.dispose();water.dispose();panorama.photo.dispose();

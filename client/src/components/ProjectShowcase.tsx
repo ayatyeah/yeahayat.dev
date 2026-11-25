@@ -219,8 +219,9 @@ function ProjectPrint({ project, featured, onOpen }: {
             sizes={featured ? '(max-width: 760px) 82vw, (max-width: 1450px) 44vw, 670px' : '(max-width: 760px) 85vw, 37vw'}
             width="1600" height="900" loading="lazy" decoding="async" alt={shot.caption[lang]} />
         </button>
+        {project.slug === 'shmagro' && <WaterFigure kind={project.slug} />}
       </div>
-      <figcaption><WaterFigure kind={project.slug} /><span>{shot.caption[lang]}</span><span className="edition-count">{index + 1} / {project.screens.length}</span>
+      <figcaption>{project.slug !== 'shmagro' && <WaterFigure kind={project.slug} />}<span>{shot.caption[lang]}</span><span className="edition-count">{index + 1} / {project.screens.length}</span>
         <p className="edition-role">{project.work[lang]}</p>
       </figcaption>
     </figure>

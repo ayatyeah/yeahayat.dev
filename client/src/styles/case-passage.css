@@ -91,3 +91,57 @@
  .studio-author .author-links {margin-top:.25rem;}
  .water-touch-hint {display:none;}
 }
+
+/* Under the prints, the same ocean remains visible through sea glass. */
+.page-main-home .project-edition {
+  --glass-paper:linear-gradient(140deg,#dcf5eff0 0%,#d0eeece0 19%,#bfe6e8c9 48%,#d8f2e6df 78%,#d1ede9cf);
+  position:relative;isolation:isolate;background:transparent;border:0;box-shadow:none;
+}
+.page-main-home .project-edition::before {
+  content:'';position:absolute;z-index:-1;pointer-events:none;inset:-35px 0 -26px;
+  background:var(--glass-paper);
+  mask-image:linear-gradient(transparent,#000 72px,#000 calc(100% - 66px),transparent);
+}
+[data-theme=dark] .page-main-home .project-edition {
+  --glass-paper:linear-gradient(142deg,#143d4ed9,#123c4acf 46%,#103b47d9);background:transparent;
+}
+.project-edition .edition-art {overflow:clip;}
+.project-edition .edition-art::before {
+  content:'';position:absolute;inset:-16%;pointer-events:none;
+  background:url('/environment/ocean-descent-small.webp') 48% 99% / 155% auto;
+  mix-blend-mode:screen;opacity:.65;
+  mask-image:linear-gradient(141deg,transparent 10%,#0006 39%,#000 86%);
+}
+.project-edition #case-shmagro .edition-art {
+  background:radial-gradient(ellipse at 88% 24%,#e9f4ce 0%,transparent 51%),linear-gradient(132deg,#b9ded7,#91bcc1 55%,#cee5d6);
+}
+.project-edition #case-shmagro .edition-screen {inset:auto auto 7% 5%;width:71%;}
+.project-edition #case-shmagro .edition-landing {width:57%;}
+.project-edition #case-shmagro .edition-art .water-figure {
+  inset:2% 0 auto auto;width:33%;aspect-ratio:1;transform-origin:50% 85%;rotate:var(--arrival-tilt,0deg);
+}
+.project-edition #case-shmagro .edition-art .water-figure canvas {display:block;width:100%;height:auto;aspect-ratio:1;translate:none;}
+.passage-bead {opacity:0;}
+.passage-sheen,.folio-glass::after {
+  position:absolute;inset:0;content:'';pointer-events:none;border-radius:inherit;
+  background:linear-gradient(115deg,transparent 22%,#daffff08 38%,#faffee80 46%,#a2f7ff52 47%,transparent 51%,transparent 57%,#d8fff93d 59%,transparent 64%);
+  background-size:230% 100%;
+}
+.passage-sheen {opacity:calc(var(--lift,0)*.9);border-radius:4px;}
+@media(prefers-reduced-motion:no-preference) {
+  .passage-sheen,.folio-glass::after {animation:folio-caustic 5.6s ease-in-out infinite alternate;}
+  @keyframes folio-caustic {from {background-position:10% 0;}to {background-position:87% 0;}}
+  .passage-page {animation:leaf-on-water 4.8s ease-in-out infinite alternate;}
+  @keyframes leaf-on-water {
+    from {rotate:y calc(-3deg * var(--lift,0));translate:0 calc(-2px * var(--lift,0));}
+    to {rotate:y calc(4deg * var(--lift,0));translate:0 calc(3px * var(--lift,0));}
+  }
+  .case-passage[data-flowing] .passage-current {animation:runoff 3s linear infinite;}
+  @keyframes runoff {to {stroke-dashoffset:-33;}}
+  .passage-drop {animation:drop-in-current 3.8s ease-in-out infinite alternate;}
+  @keyframes drop-in-current {from {transform:translate(-1px,-2px) rotate(12deg);}to {transform:translate(2px,2px) rotate(-16deg);}}
+  .project-edition .edition-case[data-in-view] .edition-art::before {animation:paper-current 7s ease-in-out infinite alternate;}
+  @keyframes paper-current {from {transform:translate(-3%,1%) rotate(-5deg);}to {transform:translate(4%,-2%) rotate(3deg);}}
+}
+
+.passage-current {opacity:0;stroke:#f0ffff;stroke-width:1.5;stroke-linecap:round;}
