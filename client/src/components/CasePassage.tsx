@@ -48,7 +48,7 @@ export default function CasePassage() {
           leaf.style.setProperty('--hinge',(cover.getAttribute('aria-pressed')==='true' ? -145-turn*23 : -22-turn*146)+'deg');
           leaf.style.setProperty('--cover-alpha',String(1-ease(clamp((t-.55)/.35))));
           cover.style.setProperty('--book-visible',String(1-clamp(t/.085)));
-          target.style.opacity=String(1-clamp((1-t)/.085));
+          target.style.opacity=String(1-alpha);
         } else {
           cover.style.removeProperty('--book-visible');
           target.style.removeProperty('opacity');
