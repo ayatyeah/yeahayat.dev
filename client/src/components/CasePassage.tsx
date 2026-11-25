@@ -50,7 +50,7 @@ export default function CasePassage() {
           cover.style.setProperty('--book-visible',String(1-clamp(t/.085)));
           target.style.opacity=String(1-alpha);
         } else {
-          cover.style.removeProperty('--book-visible');
+          cover.style.setProperty('--book-visible', t === 1 ? '0' : '1');
           target.style.removeProperty('opacity');
         }
       }

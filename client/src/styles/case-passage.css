@@ -52,7 +52,8 @@
 @media(prefers-reduced-motion:reduce){.case-passage {display:none;}}
 .passage-glint {opacity:0;}
 .passage-cover {background:linear-gradient(105deg,#d7ffffe8,#76b5c8d6 2%,#184b69d6 5%,#528da8bb 41%,#b4ecf0d6 74%,#eafcffe0 76%,#48899ebf);backface-visibility:visible;}
-[data-leaf-moving] .case-folio .folio-action {opacity:var(--book-visible,1);}
+.case-folio .folio-action {opacity:var(--book-visible,1);}
+.case-folio:focus-visible :is(.folio-desk,.folio-action) {opacity:1;}
 .project-edition .edition-plate figcaption .water-book-action {margin-inline-start:0;}
 /* A broad patch of quieter water follows the reading column. The clear
    centre and the outer edges of the photographic ocean stay in motion. */
