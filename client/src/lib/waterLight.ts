@@ -36,6 +36,9 @@ uniform vec2 pointer;
 uniform float attention;
 #ifdef LETTER_WAVES
 uniform vec4 ripples[3];
+attribute float strokeDistance;
+uniform float strokeTime;
+varying float crestLight;
 #else
 uniform vec2 impact;
 #endif
@@ -83,6 +86,14 @@ void main(){
  vec3 n=normalize(mat3(objectToWorld)*normal);
  vec4 wave=surfaceWave(p);
  #ifdef LETTER_WAVES
+ float strokeAge = time - strokeTime;
+ crestLight = 0.;
+ if (strokeAge >= 0. && strokeAge < 1.65) {
+   float front = strokeDistance - strokeAge * 2.25;
+   float envelope = exp(-32.*front*front) * (1.-smoothstep(.78,1.65,strokeAge));
+   crestLight = envelope;
+   wave.w += length(objectToWorld[0].xyz)*envelope*(.095+.035*sin(front*14.));
+ }
  // Each centre is stored on this glyph. Its position, amplitude and normal
  // gradient follow the same local-to-world transform as the surface.
  for(int i=0;i<3;i++){
@@ -129,6 +140,7 @@ varying vec3 worldPos;
 varying vec3 worldNormal;
 
 #ifdef LETTER_WAVES
+varying float crestLight;
 uniform sampler2D scenePhoto;
 uniform vec4 photoCrop;
 uniform vec2 inverseBuffer;
@@ -183,6 +195,9 @@ void main() {
   float meniscus=1.-smoothstep(.008,.075,abs(facing-.22));
   result+=mix(vec3(.16,.32,.39),vec3(.14,.25,.36),night)
           *meniscus*(.24+.76*max(-normal.y,0.));
+  #ifdef LETTER_WAVES
+  result+=sunTint*crestLight*(.17+.96*rim+.31*pow(sheen,8.));
+  #endif
   result+=night*vec3(.17,.27,.39)*rim2;
   gl_FragColor = vec4(result,1.);
   #include <colorspace_fragment>

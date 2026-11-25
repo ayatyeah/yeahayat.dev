@@ -33,7 +33,7 @@ const feedback = {
 export default function Contact() {
   const lang = useLang();
   const kk = lang === 'kk';
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const example = PROJECTS.find(project => project.slug === params.get('project'));
   const formRef = useRef<HTMLFormElement>(null);
   const [sending, setSending] = useState(false);
@@ -79,7 +79,7 @@ export default function Contact() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name, contact, consent,
-          message: example && data.has('include-example')
+          message: example
             ? (kk ? 'Ұқсас жоба — ' : 'Похожий проект — ') + example.title + '\n\n' + message
             : message
         })
@@ -140,13 +140,13 @@ export default function Contact() {
           noValidate
           onSubmit={onSubmit}
         >
-          {example && <label className="form-consent" key={example.slug}>
-            <input className="form-consent-box" type="checkbox" name="include-example" />
-            <span className="form-consent-mark" aria-hidden="true" />
-            <span className="form-consent-text">{kk
-              ? 'Хабарламада «' + example.title + '» жобасын мысал ретінде көрсету'
-              : 'Указать «' + example.title + '» как пример в сообщении'}</span>
-          </label>}
+          {example && <button type="button" className="example-chip"
+            aria-label={(kk ? 'Үлгіні алып тастау · ' : 'Убрать пример · ') + example.title}
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.delete('project');
+              setParams(next, { replace: true, preventScrollReset: true });
+            }}>{kk ? 'Үлгі' : 'Пример'} · {example.title} <span aria-hidden="true">×</span></button>}
           <div className="form-grid">
             <label className="form-field">
               <span className="form-field-label">{kk ? 'Атыңыз' : 'Имя'}</span>

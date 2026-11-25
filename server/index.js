@@ -150,6 +150,11 @@ app.get(Object.keys(legacyRoutes), (req, res) => {
   res.redirect(301, legacyRoutes[req.path]);
 });
 
+app.get('/work/:slug([a-z0-9-]+)', (req, res) => {
+  res.sendFile(req.params.slug + '.html', { root: path.join(distDir, 'case-pages'), headers: { 'Cache-Control': 'no-cache' } },
+    error => { if (error && !res.headersSent) res.sendStatus(error.statusCode || 500); });
+});
+
 // SPA-fallback: любые остальные GET-запросы получают index.html.
 app.get('*', (req, res) => {
   res.sendFile(path.join(distDir, 'index.html'), {

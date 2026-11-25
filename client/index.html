@@ -9,8 +9,9 @@
         const sky = document.createElement('link');
         sky.rel = 'preload';
         sky.as = 'image';
-        sky.href = matchMedia('(max-width: 650px) and (max-resolution: 2dppx)').matches
-          ? '/environment/ocean-descent-small.webp' : '/environment/ocean-descent.webp';
+        sky.href = '/environment/ocean-descent.webp';
+        sky.imageSrcset = '/environment/ocean-descent-small.webp 760w, /environment/ocean-descent-medium.webp 1120w, /environment/ocean-descent.webp 1520w';
+        sky.imageSizes = '(max-width: 650px) min(100vw, 370px), 100vw';
         sky.fetchPriority = 'high';
         document.head.append(sky);
       }

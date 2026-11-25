@@ -140,10 +140,10 @@ export async function mountFigures(buttons:HTMLButtonElement[],signal:AbortSigna
     obj.hit=performance.now();window.dispatchEvent(new Event('water-splash'));schedule();
   }
   const resize=new ResizeObserver(entries=>{
-    for(const entry of entries)widths.set(entry.target as HTMLButtonElement,entry.contentRect.width);
+    for(const entry of entries)widths.set(entry.target.parentElement as HTMLButtonElement,entry.contentRect.width);
     schedule();
   });
-  buttons.forEach(b=>{io.observe(b);resize.observe(b);b.addEventListener('click',splash);});
+  buttons.forEach(b=>{io.observe(b);resize.observe(b.querySelector('canvas')!);b.addEventListener('click',splash);});
   const theme=new MutationObserver(schedule);theme.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   const unwatch=watchSceneVisibility(schedule);reduced.addEventListener('change',schedule);
   signal.addEventListener('abort',()=>{

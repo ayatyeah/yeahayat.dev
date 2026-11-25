@@ -71,8 +71,9 @@ export default function OceanBackdrop() {
   return <div className="ocean-backdrop" ref={view} aria-hidden="true">
     <div className="ocean-column" ref={plate}>
       <picture>
-        <source media="(max-width: 650px) and (max-resolution: 2dppx)" srcSet="/environment/ocean-descent-small.webp" />
-        <img ref={photo} src="/environment/ocean-descent.webp" alt="" width="1520" height="2688" />
+        <img ref={photo} src="/environment/ocean-descent.webp"
+          srcSet="/environment/ocean-descent-small.webp 760w, /environment/ocean-descent-medium.webp 1120w, /environment/ocean-descent.webp 1520w"
+          sizes="(max-width: 650px) min(100vw, 370px), 100vw" alt="" width="1520" height="2688" />
       </picture>
     </div>
     <div ref={surfaceHost} />

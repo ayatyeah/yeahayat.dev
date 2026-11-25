@@ -16,6 +16,15 @@ const fields:Field[]=[
   {start:0,end:3,prisms:[[1,0],[1,2],[3,2],[3,3],[0,3],[4,1]],initial:16},
   {start:3,end:0,prisms:[[0,3],[0,1],[2,1],[2,2],[4,2],[4,0]],initial:51}
 ];
+// Each solved field opens the actual screen that demonstrates its outcome.
+const outcomes: Record<string, {screen:number; ru:string; kk:string; mark:string}> = {
+  yeahgrind: {screen:3,ru:'От урока к самопроверке',kk:'Сабақтан өзін-өзі тексеруге',mark:'M0 8 Q-7 2 -14 4 V-10 Q-6 -12 0 -6 Q7 -12 14 -10 V4 Q6 2 0 8 V-6'},
+  shmagro: {screen:2,ru:'Из каталога техники в заявку',kk:'Техника каталогынан өтінімге',mark:'M0 14 Q3 0 1 -16 M1 7 Q-8 6 -9 -2 Q-3 -2 1 4 M2 0 Q11 -2 10 -10 Q4 -9 2 -3 M2 -5 Q-5 -8 -5 -13 Q0 -12 2 -8'},
+  studyloop: {screen:4,ru:'От теста к результату',kk:'Тесттен нәтижеге',mark:'M8 -7 A11 11 0 1 0 11 2 M8 -14 V-6 H0'},
+  clicki: {screen:2,ru:'Открыть профиль автора',kk:'Автор профилін ашу',mark:'M-3 4 L-6 7 A5 5 0 0 1 -13 0 L-5 -8 A5 5 0 0 1 2 -6 M3 -4 L6 -7 A5 5 0 0 1 13 0 L5 8 A5 5 0 0 1 -2 6'},
+  ddc: {screen:2,ru:'Войти в портал сотрудников',kk:'Қызметкерлер порталын көру',mark:'M0 -13 L12 -6 V7 L0 13 L-12 7 V-6 Z M-12 -6 L0 0 L12 -6 M0 0 V13'},
+  blcsoftsale: {screen:2,ru:'Найти производителя программы',kk:'Бағдарлама өндірушісін табу',mark:'M-2 -2 A6 6 0 1 0 -7 2 L4 13 L9 8 L7 6 L5 8 Z'}
+};
 function trace(field:Field, mask:number){
   let x=-1,y=field.start,dx=1,dy=0;
   const points: Point[] = [[8, 50 + y * 100]];
@@ -114,6 +123,7 @@ export default function SunPuzzle(){
 
   const {points, won, arrivals, distance} = trace(field, mask);
   const travelTime = Math.round(Math.max(350, Math.min(1050, distance * .86)));
+  const outcome = outcomes[project.slug];
   const receiverY = 50 + field.end * 100;
   const releasing = won && release === project.slug;
   const outlet = `M581 ${receiverY} C581 ${receiverY + (400 - receiverY) * .57} 510 370 469 396`;
@@ -180,12 +190,12 @@ export default function SunPuzzle(){
             <ellipse cx="469" cy="396" rx="23" ry="5" className="sun-water-ring"/>
           </>}
           <circle cx="8" cy={50+field.start*100} r="9" fill="#fff4ae"/>
-          <g transform={'translate(581 '+(50+field.end*100)+')'}><path d="M0 -17 Q-20 4 -10 13 Q0 24 10 13 Q21 4 0 -17Z" fill={won?'#ffd27a':'#73d9ec'} stroke="#e8ffff" strokeWidth="2"/>{releasing && <circle className="sun-ripple" r="18" />}</g>
+          <g transform={'translate(581 '+(50+field.end*100)+')'}>{won ? <path d={outcome.mark} fill="none" stroke="#ffe6a7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /> : <path d="M0 -17 Q-20 4 -10 13 Q0 24 10 13 Q21 4 0 -17Z" fill={won?'#ffd27a':'#73d9ec'} stroke="#e8ffff" strokeWidth="2"/>}{releasing && <circle className="sun-ripple" r="18" />}</g>
         </svg>
         {field.prisms.map(([x,y],i)=><button key={x+','+y} type="button" className="sun-socket" data-lit={arrivals.has(i)} style={{left:((x+1)/6*100)+'%',top:((y+.5)/4*100)+'%'}} aria-label={kk?(i+1)+'-призманы бұру':'Повернуть призму '+(i+1)} aria-pressed={Boolean(mask&(1<<i))} aria-disabled={won} onClick={()=>turn(i)}><i/><span className="sun-bearing" aria-hidden="true"/></button>)}
       </div>
       <div className="sun-status" role="status">{won?(kk?'Сәуле тамшыға жетті!':'Свет пойман!'):((kk?'Алаң ':'Поле ')+(index+1)+' / '+fields.length)}{best[project.slug]&&<small>{kk?'Үздік нәтиже':'Лучший результат'} · {best[project.slug]}</small>}</div>
-      <div className="sun-actions">{won?<><LightPrint title={project.title} slug={project.slug} points={points} kk={kk} /><a href={'#case-'+project.slug}>{kk ? project.title+' жобасын ашу' : 'Открыть '+project.title} ↗</a><button type="button" onClick={()=>open((index+1)%fields.length)}>{kk?'Келесі алаң':'Следующее поле'} →</button></>:<a href={'#case-'+project.slug}>{kk?'Жобаға өту':'К проекту'} ↑</a>}<button type="button" onClick={reset}>{kk?'Қайта бастау':'Сбросить'}</button></div>
+      <div className="sun-actions">{won?<><LightPrint title={project.title} slug={project.slug} points={points} kk={kk} /><a href={'/work/'+project.slug+'?screen='+outcome.screen+'#featured-case'}>{kk ? outcome.kk : outcome.ru} ↗</a><button type="button" onClick={()=>open((index+1)%fields.length)}>{kk?'Келесі алаң':'Следующее поле'} →</button></>:<a href={'#case-'+project.slug}>{kk?'Жобаға өту':'К проекту'} ↑</a>}<button type="button" onClick={reset}>{kk?'Қайта бастау':'Сбросить'}</button></div>
     </div>
     </div>
   </section>;

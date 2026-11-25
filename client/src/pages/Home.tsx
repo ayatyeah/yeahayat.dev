@@ -1,3 +1,4 @@
+import CasePassage from '../components/CasePassage';
 import SunPuzzle from '../components/SunPuzzle';
 import ProjectWorkshop from '../components/ProjectWorkshop';
 import WaterJournal from '../components/WaterJournal';
@@ -52,6 +53,7 @@ export default function Home() {
             <ArchiveOpening heading={text.cases} introduction={text.casesIntro} />
           </div>
           <ProjectShowcase board />
+          <CasePassage />
         </section>
 
         <ProjectWorkshop />

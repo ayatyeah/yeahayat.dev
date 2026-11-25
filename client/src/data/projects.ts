@@ -13,7 +13,7 @@ export type Project = {
   label: Translation;
   benefit: Translation;
   work: Translation;
-  url: string;
+  url?: string;
   screens: ReturnType<typeof screen>[];
 };
 
@@ -32,7 +32,7 @@ export const PROJECTS: Project[] = [
     ]
   },
   {
-    slug: 'studyloop', title: 'StudyLoop', url: 'https://studyloop.tech',
+    slug: 'studyloop', title: 'StudyLoop',
     label: copy('Обучение', 'Оқу платформасы'),
     benefit: copy('Студент ведёт конспекты и видит результаты прошлых попыток, когда готовится к следующему тесту.',
       'Студент конспект жүргізіп, келесі тестке дайындалғанда бұрынғы нәтижелерін қарай алады.'),
@@ -61,7 +61,7 @@ export const PROJECTS: Project[] = [
     ]
   },
   {
-    slug: 'ddc', title: 'DDC', url: 'https://ddc-v2-production.up.railway.app',
+    slug: 'ddc', title: 'DDC',
     label: copy('Корпоративный сайт', 'Корпоративтік сайт'),
     benefit: copy('Посетители знакомятся с компанией, а сотрудники со стартовой страницы попадают во внутренний портал.',
       'Келушілер компаниямен танысады, ал қызметкерлер басты беттен ішкі порталға өтеді.'),

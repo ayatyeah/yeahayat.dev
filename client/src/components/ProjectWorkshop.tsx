@@ -13,16 +13,19 @@ const kit = [
 ];
 
 export default function ProjectWorkshop() {
+  const project = useSelectedCase() ?? PROJECTS[0];
   const lang = useLang();
   const kk = lang === 'kk';
-  const project = useSelectedCase() ?? PROJECTS[0];
-  const [mode, setMode] = useState<'cursor' | 'code'>('cursor');
-  const interfaceScreen = workbenchScreen(project);
+  const [view, setView] = useState<{slug:string; tool:'cursor'|'code'} | null>(null);
+  const mode = view?.slug === project.slug ? view.tool : 'cursor';
+  const setMode = (tool:'cursor'|'code') => setView({slug:project.slug, tool});
+  const lesson = project.slug === 'yeahgrind';
+  const interfaceScreen = lesson ? project.screens[1] : workbenchScreen(project);
   const alternate = project.screens.find(screen => screen !== interfaceScreen && screen !== project.screens[0]) ?? project.screens[0];
   const screen = mode === 'cursor' ? interfaceScreen : alternate;
   const labels = {
-    cursor: kk ? 'Интерфейс' : 'Интерфейс',
-    code: kk ? 'Іске асыру' : 'Реализация'
+    cursor: lesson ? (kk ? 'Сабақты оқу' : 'Разобрать тему') : 'Интерфейс',
+    code: lesson ? (kk ? 'Өзіңді тексеру' : 'Проверить себя') : (kk ? 'Іске асыру' : 'Реализация')
   };
   const groups = kk ? ['Интерфейстер', 'Сервер', 'Құралдар мен тілдер'] : ['Интерфейсы', 'Сервер', 'Инструменты и языки'];
 
@@ -31,7 +34,7 @@ export default function ProjectWorkshop() {
       <div className="workshop-story">
         <h2 id="stack-heading">{kk ? project.title + ' қалай жұмыс істейді?' : 'Как устроен ' + project.title}</h2>
         <div id="workshop-result" aria-live="polite" aria-atomic="true">
-          <p key={project.slug + mode}>{mode === 'cursor' ? project.benefit[lang] : project.work[lang]}</p>
+          <p key={project.slug + mode}>{lesson || mode === 'code' ? project.work[lang] : project.benefit[lang]}</p>
         </div>
       <div className="workshop-tools" id="water-tools" role="group" aria-label={kk ? 'Жоба көрінісі' : 'Взгляд на проект'}>
         {(['cursor', 'code'] as const).map(tool => <div className="workshop-tool" key={tool}>

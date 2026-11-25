@@ -2,6 +2,7 @@ import { subscribeVisualScroll } from '../hooks/useScrollFeel';
 import { createWaterLight } from './waterLight';
 export { loadPanorama } from './waterLight';
 import * as T from 'three';
+import { prepareStroke } from './letterStrokes';
 import { waterVolume } from './waterVolume';
 
 // Hand-shaped in a common 650 × 366 drawing plane. The arched tips and
@@ -52,7 +53,7 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
   renderer.setClearColor(0,0);
   const plate=document.querySelector<HTMLElement>('.ocean-column');
   const image=plate?.querySelector('img');
-  const scenePhoto=new T.Texture(image);
+  const scenePhoto=new T.Texture();
   scenePhoto.colorSpace=T.SRGBColorSpace;
   scenePhoto.minFilter=T.LinearFilter;
   scenePhoto.generateMipmaps=false;
@@ -60,10 +61,23 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
     scenePhoto:{value:scenePhoto}, photoCrop:{value:new T.Vector4(0,0,1,1)},
     inverseBuffer:{value:new T.Vector2(1,1)}, hasScenePhoto:{value:0}
   };
+  // Responsive image descriptors change naturalWidth to CSS pixels. Three
+  // allocates its GPU storage from that value, so upload the same cached
+  // source through an image with its original, unscaled pixel dimensions.
+  let sourceURL='', alive=true;
   function uploadPhoto() {
-    if (!image?.naturalWidth) return;
-    scenePhoto.needsUpdate=true;
-    optics.hasScenePhoto.value=1;
+    if (!image?.naturalWidth || sourceURL===image.currentSrc) return;
+    sourceURL=image.currentSrc;
+    const source=new Image();
+    source.src=sourceURL;
+    void source.decode().then(()=>{
+      if (!alive || source.src!==sourceURL) return;
+      scenePhoto.image=source;
+      scenePhoto.needsUpdate=true;
+      optics.hasScenePhoto.value=1;
+      cropDirty=true;
+      wake();
+    }).catch(()=>{});
   }
   image?.addEventListener('load',uploadPhoto);
   uploadPhoto();
@@ -87,10 +101,11 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
   const letters=silhouettes.map((outline,index)=>{
     const points=outline.map(([x,y])=>new T.Vector3((x-centerX[index])/units,(181-y)/units,0));
     const material=new T.ShaderMaterial({vertexShader:water.vertexShader,fragmentShader:water.fragmentShader,
-      defines:{LETTER_WAVES:1},uniforms:{...uniforms,...optics,attention:{value:0},ripples:{value:impacts[index]}}});
+      defines:{LETTER_WAVES:1},uniforms:{...uniforms,...optics,strokeTime:{value:-100},attention:{value:0},ripples:{value:impacts[index]}}});
     const mesh=new T.Mesh(waterVolume(points,material,34,index===2),material);
     mesh.position.x=(centerX[index]-325)/units;scene.add(mesh);return mesh;
   });
+  const traceStroke=letters.map((letter,i)=>prepareStroke(letter.geometry,i,centerX[i]));
   // Even the largest droplet occupies only a few pixels of the scene.
   const sphere=new T.SphereGeometry(1,10,7);
   const groups=letters.map(mesh=>{
@@ -145,7 +160,7 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
     cursor.set((pointerX-rect.left)/rect.width*2-1,1-(pointerY-rect.top)/rect.height*2);
     ray.setFromCamera(cursor,camera);
     hits.length=0;
-    const hit=ray.intersectObjects(letters,false,hits)[0];
+    const hit=ray.intersectObjects(letters,false,hits).find(hit=>hit.object.parent?.visible);
     hover=!!hit;
     hoveredLetter=hit?letters.indexOf(hit.object as typeof letters[number]):-1;
     if(hit) uniforms.pointer.value.set(hit.point.x,hit.point.y);
@@ -156,6 +171,17 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
     pointerX=e.clientX; pointerY=e.clientY; pointerPending=true;
     wake();
   }
+  let touch: {id:number;x:number;y:number} | null=null;
+  function down(e:PointerEvent){
+    if (e.pointerType==='touch') {
+      touch=e.isPrimary ? {id:e.pointerId,x:e.clientX,y:e.clientY} : null;
+    } else press(e);
+  }
+  function up(e:PointerEvent){
+    if (touch?.id===e.pointerId && Math.hypot(e.clientX-touch.x,e.clientY-touch.y)<10) press(e);
+    touch=null;
+  }
+  function cancelTouch(){touch=null;}
   function press(e:PointerEvent){
     if(!e.isPrimary || e.button!==0) return;
     pointerX=e.clientX; pointerY=e.clientY; pointerPending=false;
@@ -174,11 +200,14 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
   }
   function splash(index:number, point:T.Vector3) {
     window.dispatchEvent(new Event('water-splash'));
+    host.dataset.touched='true';
     if(reduced.matches) return;
     impactTime=time;
     struck=index;
     origin.copy(point);
     letters[struck].worldToLocal(localHit.copy(origin));
+    traceStroke[struck](localHit);
+    letters[struck].material.uniforms.strokeTime.value=time;
     impacts[struck][nextImpact[struck]].set(localHit.x,localHit.y,localHit.z,time);
     nextImpact[struck]=(nextImpact[struck]+1)%3;
     velocities.forEach((v,i)=>{
@@ -303,7 +332,7 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
     drops.forEach(({anchor},i)=>droplets.setMatrixAt(i,anchor.matrixWorld));
     droplets.instanceMatrix.needsUpdate=true;
     renderer.render(scene,camera);
-    lastFrameWasActive=!reduced.matches && (now<activeUntil || age<1.05);
+    lastFrameWasActive=!reduced.matches && (now<activeUntil || age<1.65);
     if(reduced.matches)return;
     if(lastFrameWasActive)schedule();
     else idleTimer=window.setTimeout(()=>{idleTimer=0; schedule();}, Math.max(8,1000/25-(performance.now()-now)-8));
@@ -324,7 +353,7 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
     if(reduced.matches){
       impacts.forEach(slots=>slots.forEach(slot=>{slot.w=-100;}));
       impactTime=-10; hover=false; hoveredLetter=-1; pointerPending=false;
-      letters.forEach(letter=>{letter.material.uniforms.attention.value=0;});
+      letters.forEach(letter=>{letter.material.uniforms.attention.value=0;letter.material.uniforms.strokeTime.value=-100;});
     }
     wake();
   }
@@ -339,7 +368,7 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
   });
   intersection.observe(host);
   host.addEventListener('letter-splash',keyboardSplash);
-  host.addEventListener('pointermove',move,{passive:true});host.addEventListener('pointerdown',press);host.addEventListener('pointerleave',leave);
+  host.addEventListener('pointermove',move,{passive:true});host.addEventListener('pointerdown',down);host.addEventListener('pointerup',up);host.addEventListener('pointercancel',cancelTouch);host.addEventListener('pointerleave',leave);
   document.addEventListener('visibilitychange',resetClock);reduced.addEventListener('change',resetClock);
   const themeObserver=new MutationObserver(wake);
   themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
@@ -348,11 +377,11 @@ export function mountLiquidScene(host: HTMLDivElement, panorama: Awaited<ReturnT
   scene.matrixWorldAutoUpdate=false;
   resize();
   return ()=>{
-    image?.removeEventListener('load',uploadPhoto);scenePhoto.dispose();
+    alive=false;image?.removeEventListener('load',uploadPhoto);scenePhoto.dispose();
     stopScroll();clearTimeout(idleTimer);cancelAnimationFrame(raf);themeObserver.disconnect();observer.disconnect();intersection.disconnect();
     document.removeEventListener('visibilitychange',resetClock);reduced.removeEventListener('change',resetClock);
     host.removeEventListener('letter-splash',keyboardSplash);
-    host.removeEventListener('pointermove',move);host.removeEventListener('pointerdown',press);host.removeEventListener('pointerleave',leave);
+    host.removeEventListener('pointermove',move);host.removeEventListener('pointerdown',down);host.removeEventListener('pointerup',up);host.removeEventListener('pointercancel',cancelTouch);host.removeEventListener('pointerleave',leave);
     letters.forEach(l=>{l.geometry.dispose();l.material.dispose();});droplets.dispose();sphere.dispose();
     spray.dispose();dispose();renderer.dispose();renderer.domElement.remove();
   };

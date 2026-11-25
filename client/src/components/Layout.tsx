@@ -9,6 +9,7 @@ import LanguageToggle from './LanguageToggle';
 import ThemeToggle from './ThemeToggle';
 import AmbientSound from './AmbientSound';
 import OceanBackdrop from './OceanBackdrop';
+import { PROJECTS } from '../data/projects';
 import { useChosenCase } from '../lib/selectedCase';
 
 const NAV: Array<{ to: string; label: string }> = [
@@ -101,6 +102,11 @@ export default function Layout({ children }: { children: ReactNode }) {
     const titlesKK:Record<string,string>={'/':'Портфолио','/projects':'Жобалар','/contact':'Байланыс','/github':'GitHub','/privacy':'Құпиялық саясаты'};
     document.title = kk ? 'YeahAyat — '+(titlesKK[location.pathname]??'Портфолио') : TITLES[location.pathname] ?? 'YeahAyat';
     document.querySelector('meta[name=description]')?.setAttribute('content',kk?'Аят Балмағамбет: бизнеске арналған сайттар, каталогтар және веб-қосымшалар. Жобаларым мен байланыс жолдары.':'Аят Балмагамбет — разработка сайтов, каталогов и веб-приложений для бизнеса. Примеры проектов и контакты.');
+    const shared = PROJECTS.find(project => location.pathname === '/work/' + project.slug);
+    if (shared) {
+      document.title = shared.title + ' · YeahAyat';
+      document.querySelector('meta[name=description]')?.setAttribute('content',shared.benefit[kk ? 'kk' : 'ru']);
+    }
     document.body.setAttribute('data-page', PAGE_KEYS[location.pathname] ?? 'home');
   }, [location.pathname,kk]);
 

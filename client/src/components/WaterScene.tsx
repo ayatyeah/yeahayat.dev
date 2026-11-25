@@ -176,6 +176,7 @@ export default function WaterScene({ name, introduction, discuss }: { name: stri
     <div className="water-frame" ref={frame}>
       <h1 className="water-sr">YEAH — {name}</h1>
       <div className="water-art" ref={stage} aria-hidden="true">
+        <span className="water-touch-hint">{lang === 'kk' ? 'Әріпті түртіңіз' : 'Коснитесь буквы'}</span>
         <div className="water-fallback">{letters.map(letter => <b key={letter}><i>{letter}</i></b>)}</div>
       </div>
     </div>
@@ -183,7 +184,7 @@ export default function WaterScene({ name, introduction, discuss }: { name: stri
       <header className="studio-author">
         <h2>{name}</h2>
         <p>{introduction}</p>
-        <div className="author-links"><a href="#cases">{lang === 'kk' ? 'Жұмыстарымды көру' : 'Смотреть работы'} <span aria-hidden="true">↓</span></a>
+        <div className="author-links"><a href="#featured-case">{lang === 'kk' ? 'Жұмыстарымды көру' : 'Смотреть работы'} <span aria-hidden="true">↓</span></a>
           <TransitionLink to="/contact">{discuss}</TransitionLink></div>
       </header>
       <div className="letter-list">

@@ -126,15 +126,15 @@ function Lightbox({ state, onClose, onStep }: { state: LightboxState; onClose: (
           alt={`${project.title} — ${project.screens[index].caption[lang]}`} />
         <figcaption className="lightbox-caption">
           <span>{project.title}</span>
-          <span className="lightbox-page">{project.screens[index].caption[lang]}</span>
+          <span className="lightbox-page" role="status" aria-atomic="true"><span className="water-sr">{index+1} / {project.screens.length} · </span>{project.screens[index].caption[lang]}</span>
           {many && (
             <span className="lightbox-counter">
               {index + 1} / {project.screens.length}
             </span>
           )}
-          <a className="lightbox-visit" href={project.url} target="_blank" rel="noreferrer">
+          {project.url && <a className="lightbox-visit" href={project.url} target="_blank" rel="noreferrer">
             {text.site} ↗
-          </a>
+          </a>}
         </figcaption>
         {many && (
           <>
@@ -161,6 +161,22 @@ const homeProjects = [
   ...PROJECTS.filter(project => !leadCases.includes(project.slug)),
 ];
 
+function ShareCase({project}: {project: Project}) {
+  const kk = useLang() === 'kk';
+  const [copied, setCopied] = useState(false);
+  const url = '/work/' + project.slug;
+  return <a href={url} onClick={async event => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || !navigator.clipboard) return;
+    event.preventDefault();
+    try {
+      await navigator.clipboard.writeText(new URL(url, window.location.origin).href);
+      setCopied(true);
+    } catch { window.location.assign(url); }
+  }} onBlur={() => setCopied(false)}><span role="status">{copied
+    ? (kk ? 'Сілтеме көшірілді' : 'Ссылка скопирована')
+    : (kk ? 'Жобамен бөлісу' : 'Поделиться кейсом')}</span></a>;
+}
+
 function ProjectPrint({ project, featured, onOpen }: {
   project: Project; featured: boolean; onOpen: (project: Project, index: number) => void;
 }) {
@@ -185,7 +201,8 @@ function ProjectPrint({ project, featured, onOpen }: {
         <button type="button" className="edition-read" onClick={() => onOpen(project, index)}>
           {mainAction}<span aria-hidden="true">↗</span>
         </button>
-        <a href={project.url} target="_blank" rel="noreferrer">{text.site} ↗</a>
+        {project.url && <a href={project.url} target="_blank" rel="noreferrer">{text.site} ↗</a>}
+        <ShareCase project={project} />
         <a href="#stack" onClick={() => selectCase(project.slug)}>{lang === 'kk' ? 'Қалай жасалды' : 'Как устроен проект'} ↓</a>
       </div>
     </div>
@@ -202,9 +219,10 @@ function ProjectPrint({ project, featured, onOpen }: {
             sizes={featured ? '(max-width: 760px) 82vw, (max-width: 1450px) 44vw, 670px' : '(max-width: 760px) 85vw, 37vw'}
             width="1600" height="900" loading="lazy" decoding="async" alt={shot.caption[lang]} />
         </button>
-        <WaterFigure kind={project.slug} />
       </div>
-      <figcaption><span>{shot.caption[lang]}</span><span>{index + 1} / {project.screens.length}</span></figcaption>
+      <figcaption><WaterFigure kind={project.slug} /><span>{shot.caption[lang]}</span><span className="edition-count">{index + 1} / {project.screens.length}</span>
+        <p className="edition-role">{project.work[lang]}</p>
+      </figcaption>
     </figure>
   </article>;
 }
@@ -213,12 +231,17 @@ function projectFromHash() {
   return PROJECTS.find(project => window.location.hash === '#case-' + project.slug);
 }
 
-export default function ProjectShowcase({ board = false }: { board?: boolean }) {
+export default function ProjectShowcase({ board = false, single }: { board?: boolean; single?: Project }) {
   const lang = useLang();
   const text = copy[lang];
-  const selected = useSelectedCase() ?? projectFromHash() ?? PROJECTS[0];
+  const current = useSelectedCase();
+  const selected = single ?? current ?? projectFromHash() ?? PROJECTS[0];
   const [lightbox, setLightbox] = useState<LightboxState>(null);
-  const [reader, setReader] = useState<LightboxState>(null);
+  const [reader, setReader] = useState<LightboxState>(() => {
+    const screen = new URLSearchParams(location.search).get('screen');
+    const index = Number(screen) - 1;
+    return Number.isInteger(index) && index >= 0 && index < selected.screens.length ? {project:selected, index} : null;
+  });
   const transition = useRef<ReturnType<Document['startViewTransition']> | null>(null);
   const lastCover = useRef('');
   useEffect(()=>{
@@ -314,7 +337,7 @@ export default function ProjectShowcase({ board = false }: { board?: boolean }) 
 
   return (
     <div className="project-archive" id="featured-case">
-      <div className="archive-index" role="tablist" aria-label={text.projects}>
+      {!single && <div className="archive-index" role="tablist" aria-label={text.projects}>
         {PROJECTS.map((project, index) => (
           <button type="button" role="tab" key={project.slug} id={'tab-' + project.slug}
             aria-controls={'case-' + project.slug} aria-selected={selected === project}
@@ -337,10 +360,10 @@ export default function ProjectShowcase({ board = false }: { board?: boolean }) 
             <small>{project.label[lang]}</small>
           </button>
         ))}
-      </div>
-      {PROJECTS.map(project => (
-        <article key={project.slug} className="archive-entry" role="tabpanel" tabIndex={-1}
-          id={'case-' + project.slug} aria-labelledby={'tab-' + project.slug} hidden={selected !== project}>
+      </div>}
+      {(single ? [single] : PROJECTS).map(project => (
+        <article key={project.slug} className="archive-entry" role={single ? undefined : 'tabpanel'} tabIndex={-1}
+          id={'case-' + project.slug} aria-labelledby={single ? undefined : 'tab-' + project.slug} hidden={selected !== project}>
           {selected === project && (
             <CaseReader project={project} last={lastCover} index={reader?.project===project?reader.index:0}
               setIndex={index=>setReader({project,index})} open={index => zoom({ project, index })} />
@@ -354,7 +377,8 @@ export default function ProjectShowcase({ board = false }: { board?: boolean }) 
             <div><dt>{text.work}</dt><dd>{project.work[lang]}</dd></div>
           </dl>
           <div className="archive-actions" style={{display: 'flex', flexWrap: 'wrap', gap: '8px 24px'}}>
-            <a className="archive-visit" href={project.url} target="_blank" rel="noreferrer">{text.site} ↗</a>
+            <ShareCase project={project} />
+            {project.url && <a className="archive-visit" href={project.url} target="_blank" rel="noreferrer">{text.site} ↗</a>}
             {window.location.pathname === '/'
               ? <a className="archive-visit" href="#light-game" onClick={() => selectCase(project.slug)}>{text.play} ↓</a>
               : <TransitionLink className="archive-visit" to={'/?field=' + project.slug + '#light-game'}>{text.play} ↗</TransitionLink>}

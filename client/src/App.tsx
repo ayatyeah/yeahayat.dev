@@ -18,6 +18,7 @@ export default function App() {
             {Object.entries(routeModules).map(([path, module]) =>
               <Route key={path} path={path} element={<Page module={module} />} />
             )}
+            <Route path="/work/:slug" element={<Page module={routeModules['/projects']} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
