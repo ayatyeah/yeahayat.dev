@@ -1,0 +1,103 @@
+/* The wordmark and preferences share the first row. Both languages get a
+   full-width second row for the three destinations, even at 320 CSS pixels. */
+@media (max-width: 690px), (pointer: coarse) and (max-width: 760px) {
+  .water-nav,
+  .tide-header {
+    --header-side: max(12px, env(safe-area-inset-right));
+    --header-top: max(8px, env(safe-area-inset-top));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: var(--header-top) var(--header-side) 4px;
+  }
+
+  .water-nav > a,
+  .tide-header > a {
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    min-height: 44px;
+    margin: 0;
+  }
+
+  .water-nav nav,
+  .tide-header nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .water-nav nav > a,
+  .tide-header nav > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    white-space: nowrap;
+  }
+
+  :is(.water-nav, .tide-header) .lang-switch {
+    position: absolute;
+    top: var(--header-top);
+    right: calc(var(--header-side) + 52px);
+    padding: 0;
+    gap: 0;
+  }
+  :is(.water-nav, .tide-header) .lang-switch button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  :is(.water-nav, .tide-header) .theme-toggle {
+    position: absolute;
+    top: var(--header-top);
+    right: var(--header-side);
+    width: 44px;
+    height: 44px;
+  }
+
+}
+
+@media (max-width: 540px) {
+  .water-work,
+  .water-project > div > a,
+  .archive-visit,
+  .sun-actions > :is(a, button),
+  .horizon-contact a,
+  .tide-footer a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .water-project > div > a { text-wrap: balance; }
+  .water-work { bottom: max(12px, env(safe-area-inset-bottom)); }
+  .sun-levels button,
+  .sun-board .sun-socket { min-height: 44px; min-width: 44px; }
+  .tide-footer { padding-right: max(68px, env(safe-area-inset-right)); }
+}
+
+@media (max-width: 540px) and (max-height: 650px) and (orientation: portrait) and (prefers-reduced-motion: no-preference) {
+  .water-chapters { top: 40%; }
+}
+
+/* Allow the long Kazakh word to use the reading column before the tools wrap. */
+@media (max-width: 900px) {
+  html[lang=kk] .page-main-home .journal-tools-head {
+    row-gap: 14px;
+  }
+  html[lang=kk] .page-main-home .journal-tools-head h2 {
+    max-width: 100%;
+    overflow-wrap: normal;
+    flex: 1 1 19ch;
+    font-size: clamp(27px, 4.6vw, 42px);
+  }
+}
+@media (max-width: 370px) and (max-height: 650px) {
+  .page-main-home .water-frame[data-chapter]:not([data-chapter=""]) .water-progress {
+    top: auto;
+    right: auto;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 14px;
+  }
+}

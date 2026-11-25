@@ -1,0 +1,35 @@
+@media (pointer: coarse) {
+  .project-workshop .workshop-return {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+@media (pointer: coarse) {
+  .sun-lab .sun-levels button {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+  }
+}
+
+/* When a single letter rises, its selector stays with the chapter controls,
+   leaving the sculpture and the upper navigation clear. */
+@media (max-width: 540px) and (prefers-reduced-motion: no-preference) {
+  .page-main-home .water-frame[data-chapter]:not([data-chapter=""]) .water-progress {
+    inset: auto auto max(10px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+}
+
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 520px) and (min-width: 541px) {
+  .page-main-home .water-nav {
+    padding-block: max(4px, env(safe-area-inset-top)) 4px;
+  }
+  .page-main-home .water-nav :is(nav > a, .lang-switch button, .theme-toggle) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 44px;
+    min-inline-size: 44px;
+  }
+}

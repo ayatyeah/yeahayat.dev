@@ -1,0 +1,44 @@
+.page-main-home #stack {
+  padding:clamp(68px,10vw,165px) max(6vw,calc((100vw - 1250px)/2)) clamp(34px,6vw,90px);
+}
+.page-main-home #stack .workshop-stage {
+  display:grid;grid-template-columns:minmax(0,.83fr) minmax(0,1.3fr);gap:clamp(30px,6vw,96px);align-items:center;text-align:start;
+}
+.page-main-home #stack .workshop-story h2 {
+  max-width:11ch;margin:0;font:510 clamp(44px,5.3vw,85px)/1.02 var(--type-interface);letter-spacing:-.065em;text-wrap:balance;
+}
+.page-main-home #stack #workshop-result {min-height:0;margin:1rem 0 0;}
+#stack .workshop-tools {justify-content:flex-start;margin:.8rem 0 1rem;gap:1rem;}
+#stack .workshop-tool button {width:96px;grid-template-columns:1fr;min-height:44px;gap:0;padding:.15rem .25rem;font-size:.83rem;background:transparent;}
+#stack .workshop-tool canvas {width:66px;}
+#stack .workshop-print {margin:0;min-width:0;}
+#stack .workshop-print img {display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;object-position:top;border:1px solid #e7fdffb8;border-radius:5px;box-shadow:0 24px 56px #00284452;}
+#stack .workshop-print figcaption {display:flex;justify-content:space-between;gap:1rem;margin-top:.8rem;font:510 .84rem/1.4 var(--type-interface);color:#fff;}
+#stack .workshop-print figcaption span {text-align:end;font-weight:400;}
+.page-main-home #stack .workshop-kit {max-width:none;margin:clamp(32px,5vw,74px) 0 0;}
+.page-main-home #light-game {display:block;width:min(88%,1250px);max-width:none;box-sizing:border-box;margin:0 auto;padding:0;border-radius:0;}
+.sun-invitation {display:grid;grid-template-columns:100px 1fr auto;align-items:center;gap:clamp(15px,2.6vw,40px);border-block:1px solid #d7f6ff6b;padding:clamp(20px,3.6vw,54px) 0;}
+.sun-invitation h2 {margin:0;color:#f5feff;font:510 clamp(32px,4.5vw,65px)/1.05 var(--type-interface);letter-spacing:-.058em;}
+.sun-invitation p {max-width:50ch;margin:.6em 0 0;color:#e3f6ff;line-height:1.5;}
+.sun-invitation .sun-start {display:inline-flex;align-items:center;justify-content:space-between;gap:1.5em;padding:.76rem 1.2rem;min-height:44px;background:#e0f8fc;color:#113f51;border:1px solid #eefcff;border-radius:4rem;}
+.sun-optic {position:relative;display:block;width:100%;aspect-ratio:1;}
+.sun-optic::before {content:'';position:absolute;left:0;top:53%;width:94%;height:1px;background:linear-gradient(90deg,transparent,#fff0a0 45%,#fff4c7);box-shadow:0 0 7px #eac459;}
+.sun-optic i {position:absolute;inset:15% 17%;clip-path:polygon(51% 0,100% 83%,95% 91%,6% 94%,0 85%);background:conic-gradient(from 2deg at 51% 66%,#b5ebffaa,#ecffffdd 14%,#5db7cf99 26%,#b2f4f4 34%,#eaffff99 50%,#254f7899 65%,#d5f8ffaa 84%,#d7ffff);}
+#sun-console:not([hidden]) {display:grid;grid-template-columns:minmax(0,.55fr) minmax(0,1fr);gap:clamp(22px,5vw,84px);padding:2rem 0;align-items:center;}
+.page-main-home #sun-console .sun-copy,.page-main-home #sun-console .sun-instrument {grid-column:auto;grid-row:auto;background:none;padding:0;}
+#sun-console .sun-copy::before {content:none;}
+body[data-page=home] #contact-horizon {min-height:78svh;padding:clamp(86px,12vw,180px) 6%;display:grid;place-items:center;text-align:center;}
+#contact-horizon .horizon-message {max-width:64rem;}
+#horizon-heading {margin:0 auto;color:#f4feff;font:510 clamp(55px,8vw,138px)/1.02 var(--type-interface);letter-spacing:-.074em;text-wrap:balance;text-shadow:0 2px 18px #032e4990;}
+#contact-horizon .horizon-message .horizon-brief {max-width:40ch;margin:1.2rem auto;color:#edfaff;line-height:1.55;text-shadow:0 1px 8px #032943;}
+#contact-horizon .horizon-primary a {display:inline-flex;align-items:center;gap:1.25rem;min-height:48px;padding:.85rem 1.55rem;border-radius:4rem;background:#e9fbff;color:#113a4b;text-decoration:none;font:550 1rem/1 var(--type-interface);}
+#contact-horizon .horizon-links {margin-top:.8rem;}
+#contact-horizon .horizon-links a {display:inline-flex;align-items:center;min-height:44px;color:#edfaff;}
+@media(max-width:760px) {
+  .page-main-home #stack .workshop-stage {grid-template-columns:minmax(0,1fr);gap:26px;}
+  #stack .workshop-print figcaption {font-size:.77rem;}
+  .sun-invitation {grid-template-columns:40px 1fr;align-items:start;gap:13px;}
+  .sun-invitation .sun-start {grid-column:2;justify-self:start;}
+  #sun-console:not([hidden]) {grid-template-columns:1fr;gap:16px;}
+  #contact-horizon .horizon-message .horizon-brief {max-width:32ch;}
+}

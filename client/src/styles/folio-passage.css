@@ -1,0 +1,36 @@
+/* A single physical print stays at the reading line while the portfolio
+   comes up to meet it. The regular document still owns all scrolling. */
+.page-main-home .workbench-preview {
+  width:min(100%, 820px);
+}
+.page-main-home .workbench-preview figcaption {
+  align-items:baseline;
+  justify-content:center;
+  gap:.3em .85em;
+  padding:.85rem .5rem 0;
+  color:#f1f9ff;
+  text-shadow:0 1px 7px #123e59;
+}
+.page-main-home .workbench-preview figcaption b {
+  font-size:1.12em;
+  font-weight:650;
+}
+.page-main-home .workbench-display {
+  border:1px solid #e4fbffa3;
+  border-radius:clamp(5px,.65vw,11px);
+}
+@media(prefers-reduced-motion:no-preference) {
+  .page-main-home .water-journal[data-motion=on] .services-ledger.service-workbench {
+    padding-bottom:105svh;
+  }
+  .page-main-home .water-journal[data-motion=on] .workbench-preview figcaption {
+    opacity:clamp(0,calc((.70 - var(--folio-flight,0))*5),1);
+  }
+  .page-main-home .water-journal[data-motion=on] .workbench-display {
+    opacity:clamp(0,calc((.98 - var(--folio-flight,0))*15),1);
+  }
+  .page-main-home .water-journal[data-motion=on] .folio-prints img:first-child {
+    transform:rotate(-11deg) rotateY(18deg);
+    opacity:clamp(0,calc((var(--folio-flight,0) - .90)*14),1);
+  }
+}

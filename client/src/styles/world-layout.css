@@ -1,0 +1,134 @@
+/* The studio sculpture and glass book share their canvas with the working interface. */
+.page-main-home .business-about {
+  background: linear-gradient(var(--studio-edge), var(--air) 37%);
+}
+.page-main-home .business-intro {
+  min-height: 0;
+  padding-block: clamp(65px, 7.5vw, 128px) clamp(32px, 4vw, 68px);
+  background: transparent;
+}
+.page-main-home .business-intro :is(h2, .panel-label, p) {
+  position: relative;
+}
+.page-main-home .business-intro h2 {
+  font-size: clamp(48px, 6.4vw, 94px);
+  max-width: 12ch;
+}
+.page-main-home .business-intro > .scene-art {
+  inset: -4% 0 auto auto;
+  width: clamp(50%, 63vw, 920px);
+  height: 113%;
+  object-fit: cover;
+  object-position: 82% 53%;
+  mask-image: radial-gradient(ellipse 74% 71% at 70% 47%, black 24%, #000e 43%, transparent 86%);
+}
+.page-main-home .business-intro::before,
+.page-main-home .business-intro::after { content: none; }
+[data-theme=dark] .page-main-home .business-intro > .scene-art {
+  filter: saturate(.72) brightness(.68);
+}
+.page-main-home .home-cases .archive-banner {
+  --waterline-height: clamp(86px, 9vw, 148px);
+  min-height: 0;
+  justify-content: center;
+  background: transparent;
+  padding-block: calc(var(--waterline-height) + clamp(12px, 1.8vw, 35px)) clamp(22px, 2.9vw, 45px);
+}
+.page-main-home .home-cases .archive-banner::before { content: none; }
+.page-main-home .home-cases .archive-banner > .scene-art {
+  inset: auto var(--shore) 0 auto;
+  width: min(44%, 620px);
+  height: calc(100% - var(--waterline-height)*.7);
+  object-fit: cover;
+  object-position: 75% 56%;
+  mask-image: radial-gradient(ellipse 80% 72% at 68% 53%, black 21%, #000e 40%, transparent 82%);
+}
+.page-main-home .home-cases .archive-banner h2 {
+  max-width: 15ch;
+  font-size: clamp(36px, 4.8vw, 72px);
+}
+.page-main-home .home-cases .archive-banner .business-case-note {
+  max-width: min(42ch, 48%);
+  margin-top: .7em;
+}
+.page-main-home .home-cases .archive-banner .scene-link {
+  margin-top: .35em;
+}
+@media (max-width: 760px) {
+  .page-main-home .business-intro {
+    padding-block: clamp(54px, 9vw, 77px) 30px;
+  }
+  .page-main-home .business-intro h2 {
+    font-size: clamp(38px, 8.2vw, 61px);
+  }
+  .page-main-home .business-intro > .scene-art {
+    inset: -3% -6% auto auto;
+    height: 85%;
+    width: 60%;
+    object-position: 86% center;
+    mask-image: radial-gradient(ellipse 73% 67% at 78% 36%, black 20%, #000a 48%, transparent 85%);
+  }
+  .page-main-home .business-intro > p:not(.panel-label) { max-width: min(76%, 43ch); }
+  .page-main-home .home-cases .archive-banner {
+    --waterline-height: 72px;
+    padding-block: 100px 20px;
+  }
+  .page-main-home .home-cases .archive-banner h2 { max-width: 62%; font-size: clamp(30px, 6.9vw, 51px); }
+  .page-main-home .home-cases .archive-banner > .scene-art {
+    inset: 79px 0 auto auto;
+    width: 43%; height: min(21vw, 125px);
+    mask-image: radial-gradient(ellipse 90% 88% at 69% 50%, black 16%, #000c 45%, transparent 82%);
+  }
+  .page-main-home .home-cases .archive-banner .business-case-note { max-width: min(41ch, 92%); }
+}
+@media(max-width:360px){
+  .page-main-home .business-intro > p:not(.panel-label) { max-width: 97%; }
+  .page-main-home .business-intro > .scene-art {height: 61%; opacity:.78}
+  .page-main-home .home-cases .archive-banner h2 {font-size: 29px;max-width: 78%;}
+}
+.page-main-home .home-cases .archive-banner > .scene-art {
+  mask-image:
+    radial-gradient(ellipse 82% 80% at 62% 55%, black 21%, #000e 40%, transparent 87%),
+    linear-gradient(90deg, transparent, black 15%, black 83%, transparent),
+    linear-gradient(transparent, black 16%, black 78%, transparent);
+  mask-composite: intersect;
+}
+
+/* The case and its workshop read as one chapter. The full archive route carries
+   the case notes for readers who open it independently. */
+.page-main-home .home-cases { padding-bottom: clamp(18px, 2vw, 36px); }
+.page-main-home .home-cases .archive-detail { display: none; }
+.page-main-home .home-cases .archive-banner h2 { max-width: min(15ch, 59%); }
+.page-main-home .home-cases .project-archive .archive-heading { min-height: clamp(100px,12vw,170px); }
+@media (max-width:760px) {
+  .page-main-home .home-cases .archive-banner h2 { max-width: 70%; }
+}
+
+/* Each archive tab is a photographic contact print of the real site. */
+.project-archive .archive-index button {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) clamp(46px,5.5vw,78px);
+  grid-template-rows: auto auto;
+  gap: .2em .8rem;
+  align-content: center;
+  align-items: center;
+}
+.archive-index .archive-tab-name { grid-area: 1/1; overflow-wrap: anywhere; }
+.archive-index small { grid-area: 2/1; }
+.archive-index .archive-tab-print {
+  display: block; grid-area: 1/2/3/3; width: 100%; height: auto;
+  border-radius: 3px; border: 1px solid #a3c4d775;
+  opacity: .66; transform: perspective(470px) rotateY(-12deg) rotateZ(-2deg);
+}
+.archive-index button:is([aria-selected=true],:focus-visible,:hover) .archive-tab-print {
+  opacity: 1; transform: none;
+}
+@media (prefers-reduced-motion:no-preference) {
+  .archive-index .archive-tab-print { transition: transform .35s ease-out,opacity .25s ease-out; }
+}
+@media(max-width:760px) {
+  .project-archive .archive-index button { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 6px; padding: 7px 8px 9px; }
+  .archive-index .archive-tab-print { width: 100%; height: clamp(25px,6.8vw,46px); object-fit: cover; object-position: 50% 25%; }
+  .archive-index .archive-tab-name { font-size: .83rem; }
+}

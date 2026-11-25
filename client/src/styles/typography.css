@@ -1,0 +1,38 @@
+@font-face {
+  font-family: Inter;
+  src: url('/fonts/inter.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+:root {
+  --type-interface: Inter, system-ui, sans-serif;
+  --type-display: var(--type-interface);
+}
+
+body,
+.tide-header, .tide-footer, .page-main, .lightbox,
+.water-nav, .water-work, .water-intro p,
+.page-main :is(.panel-label, .case-shot-hint, .case-shot-count, .project-link, .stat-caption,
+  .skill-chip, .stat-value, .form-field-label, .form-control, .form-submit.btn, .policy-updated),
+.page-main .contact-row span, .lightbox-caption {
+  font-family: var(--type-interface);
+}
+
+.page-main :is(.water-intro h2, .page-title, .section-head h2, .impact-panel h2, .case-body h3, .form-heading) {
+  font-family: var(--type-display);
+  font-weight: 560;
+  letter-spacing: -.035em;
+  line-height: 1.03;
+}
+
+.page-main .case-body h3 { letter-spacing: -.025em; }
+
+.page-main .water-intro h2 {font-size:clamp(36px,6.4vw,106px)}
+.page-main .section-head h2 {font-size:clamp(30px,4.6vw,74px)}
+.page-main .case-body h3 {font-size:clamp(22px,2.2vw,36px)}
+.page-main .case-card:first-child .case-body h3 {font-size:clamp(25px,3.2vw,48px)}
+.page-main .page-title {font-size:clamp(34px,6.2vw,96px)}
+.page-main .impact-panel h2 {font-size:clamp(32px,4.4vw,66px)}
+.page-main .page-title-sm {font-size:clamp(23px,4vw,62px);overflow-wrap:anywhere}

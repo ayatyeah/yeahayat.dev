@@ -1,0 +1,27 @@
+.archive-heading .water-figure.water-book {
+  width: clamp(100px, 9vw, 136px);
+  height: auto;
+  aspect-ratio: auto;
+  display: grid;
+  justify-items: center;
+  border-radius: 12px;
+  color: inherit;
+}
+.water-book canvas { aspect-ratio: 1; }
+.water-book-action {
+  padding: 0 3px 4px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.water-book:hover .water-book-action { text-decoration-thickness: 2px; }
+
+.water-book[data-book-fallback=true] {position:relative;perspective:360px}
+.water-book[data-book-fallback=true] canvas {opacity:0}
+.water-book[data-book-fallback=true]::before,.water-book[data-book-fallback=true]::after {content:'';position:absolute;top:12%;left:41%;width:37%;height:53%;transform-origin:left center;border:1px solid #97c9de;border-radius:3px 8px 6px 3px;background:linear-gradient(125deg,#eafaff,#558cb4 75%,#d6f7ff);box-shadow:2px 3px 0 #416c8a4a;transform:rotateY(-20deg);transition:transform .6s ease-out}
+.water-book[data-book-fallback=true]::after {background:linear-gradient(115deg,#97cedb,#f0ffff,#a1c6de)}
+.water-book[data-book-fallback=true][aria-expanded=true]::after {transform:rotateY(-157deg)}
+@media(prefers-reduced-motion:reduce){.water-book[data-book-fallback=true]::after{transition:none}}

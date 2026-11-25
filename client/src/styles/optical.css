@@ -1,0 +1,246 @@
+/* The daylight studio, blue-hour archive and light table share the same reading edge. */
+.page-main.page-main-home {
+  --shore: max(clamp(20px, 6vw, 96px), calc((100% - 1320px) / 2));
+  width: 100%;
+  gap: 0;
+  padding: 0;
+}
+.page-main-home .water-track { width: 100%; }
+.page-main-home .water-journal { padding: 0; }
+.page-main-home .journal-shore { display: none; }
+.page-main-home .journal-thread { left: 1%; width: 3%; z-index: 2; opacity: .48; }
+.scene-art { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.water-art { background: #74ace1 url('/environment/optical-sky.webp') center / cover; }
+.water-work {
+  display: grid; justify-items: start; gap: 4px; bottom: 5%; color: #10293e;
+  padding: 16px 20px; background: #edf8ffdc; border: 1px solid #fff9;
+  border-radius: 3px 24px 3px 3px; box-shadow: inset 0 1px 0 #fff;
+}
+.water-work span { font: 650 clamp(18px, 1.9vw, 31px)/1.1 var(--type-interface); letter-spacing: -.045em; }
+.water-work p { font-size: clamp(12px, 1vw, 17px); margin: 0; }
+.water-work a { display: inline-flex; align-items: center; margin-top: .45em; font-size: .9em; text-decoration: underline; text-underline-offset: .22em; }
+.water-nav { background: linear-gradient(#edf8ffb3, transparent); }
+.water-progress { color: #092942; padding: 8px; border-radius: 6px; background: #e8f6ffc4; }
+[data-theme=dark] .water-work, [data-theme=dark] .water-progress { background: #0c263ade; color: #edf8ff; border-color: #9ac0d540; }
+[data-theme=dark] .water-nav { background: linear-gradient(#091d32bf, transparent); }
+.water-nav a { text-shadow: 0 0 8px #deefff90; }
+[data-theme=dark] .water-nav a { text-shadow: 0 1px 5px #081624; }
+
+.page-main-home .business-about { display: block; padding: 0; }
+.business-intro, .archive-banner { position: relative; isolation: isolate; overflow: hidden; }
+.business-intro .scene-art, .archive-banner .scene-art { position: absolute; z-index: -2; inset: 0; }
+.business-intro::before, .archive-banner::before {
+  content: ''; position: absolute; z-index: -1; pointer-events: none; inset: 0;
+}
+.business-intro {
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+  padding: clamp(44px, 6vw, 95px) var(--shore); min-height: clamp(460px, 41vw, 690px);
+  background: #b9dff4; color: #0b2b46;
+}
+.business-intro::before { background: linear-gradient(90deg, #d9effff7 0%, #d9efffdb 27%, #c5e5ff69 47%, transparent 66%); }
+.business-intro .panel-label { color: #153c55; }
+.business-intro h2 { max-width: 9.5ch; font-size: clamp(56px, 6.9vw, 118px); line-height: .94; color: inherit; }
+.business-intro > p:not(.panel-label) { color: #18394e; max-width: min(44ch, 48%); }
+.page-main .business-contact-link { color: white; background: #0c344d; }
+.services-ledger { padding: clamp(48px, 6vw, 100px) var(--shore); }
+.services-ledger h3 { margin: 0 0 1.1em; color: var(--sea-ink); font: 560 clamp(30px, 3.7vw, 64px)/1.08 var(--type-display); letter-spacing: -.05em; }
+.business-services { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3.8vw, 65px); }
+.business-services > div { border-top: 1px solid var(--sea-link); padding-bottom: 0; }
+.business-services dd a, .scene-link { display: table; color: inherit; text-decoration: underline; text-underline-offset: .28em; font-weight: 600; margin-top: .9em; }
+.business-services dd a { color: var(--sea-link); }
+.page-main-home .home-cases { padding: 0 0 clamp(44px, 7vw, 100px); }
+.page-main .archive-banner {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 0;
+  width: 100%; margin: 0 0 clamp(28px, 4vw, 70px); min-height: clamp(380px, 34vw, 570px);
+  padding: clamp(42px, 5vw, 90px) var(--shore); color: #f6fbff; background: #122649;
+}
+.archive-banner::before { background: linear-gradient(90deg, #071a34f2, #071a34a8 32%, transparent 69%); }
+.page-main .archive-banner h2 { max-width: 10ch; color: inherit; font-size: clamp(48px, 6.3vw, 108px); line-height: .97; }
+.archive-banner .business-case-note { color: #d9e9fd; max-width: min(33ch, 44%); }
+.scene-link { min-height: 44px; align-content: center; }
+.home-cases .project-archive { margin-inline: var(--shore); }
+.archive-cover { box-shadow: 0 12px 32px -17px #20476252; }
+.archive-index button { transition: background-color .18s ease; }
+.page-main-home .skills-marquee {
+  position: relative; isolation: isolate; overflow: hidden; padding: clamp(46px, 6vw, 100px) var(--shore);
+  --sea-ink: #eff7ff; --sea-muted: #c1dcea; --sea-line: #9bc8e84a;
+  background: #0a1927; color: var(--sea-ink); margin: 0; border: 0; border-radius: 0;
+}
+.conduit-art { position: absolute; inset: 0 0 0 22%; z-index: -2; }
+.conduit-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,#0a1927, #0a1927c7 24%, #0a192740 66%); }
+.skills-marquee .journal-tools-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.page-main .journal-tools-head h2 { color: inherit; max-width: 12ch; margin: 0; }
+.journal-tools-head .water-tools { height: auto; background: none; }
+.journal-tools-head .water-figure { width: clamp(66px, 7vw, 115px); background: radial-gradient(ellipse,#d1efff75, #d1efff12 64%, transparent 71%); }
+.journal-skills { max-width: 680px; }
+.journal-skills .journal-skill-row { grid-template-columns: minmax(0, .85fr) minmax(0, 1.3fr); }
+.page-main-home .sun-lab {
+  isolation: isolate; overflow: hidden; margin: 0; border-radius: 0;
+  padding: clamp(65px, 8vw, 132px) var(--shore);
+  background: #031823 url('/environment/optical-prism.webp') center / cover;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .87fr); gap: clamp(30px, 7vw, 100px);
+}
+.sun-lab .sun-instrument { grid-column: 1; grid-row: 1; }
+.sun-lab .sun-copy { grid-column: 2; grid-row: 1; align-self: start; padding: clamp(15px, 2.2vw, 34px); background: #061c29d9; border: 1px solid #bbf4ff50; border-radius: 4px 26px 4px 4px; }
+.sun-lab .sun-copy h2 { color: #f4fcff; }
+.sun-lab .sun-instrument { padding: clamp(12px, 1.8vw, 27px); border: 1px solid #8ecad745; border-radius: 22px; background: #051722df; }
+@media(prefers-reduced-motion:no-preference) {
+  .business-intro .scene-art, .archive-banner .scene-art {
+    transform: scale(1.045) translateY(calc((1 - var(--enter, 1)) * 1.6%));
+  }
+}
+@media(max-width:760px){
+  .page-main-home .journal-thread { display: none; }
+  .business-intro, .page-main .archive-banner { justify-content: end; min-height: 510px; padding: 38px var(--shore); }
+  .business-intro .scene-art { object-position: 66% 0; height: 75%; }
+  .business-intro::before { background: linear-gradient(0deg,#d9efff 2%,#d9effff5 21%,#d9efffc7 43%,transparent 71%); }
+  .business-intro > p:not(.panel-label) { max-width: 43ch; }
+  .business-intro h2 { font-size: clamp(52px, 10vw, 76px); }
+  .business-services { grid-template-columns: 1fr; gap: 20px; }
+  .services-ledger h3 { max-width: 15ch; }
+  .archive-banner .scene-art { height: 85%; object-position: 72% 0; }
+  .archive-banner::before { background: linear-gradient(0deg, #071a34 3%, #071a34ed 25%, #071a345e 57%, transparent 80%); }
+  .archive-banner .business-case-note { max-width: 40ch; margin-top: .7rem; }
+  .page-main .archive-banner { min-height: 430px; }
+  .conduit-art { inset: 0; opacity: .65; }
+  .journal-skills .journal-skill-row { grid-template-columns: 1fr; }
+  .page-main-home .sun-lab { grid-template-columns: 1fr; gap: 22px; padding-block: 42px; }
+  .sun-lab .sun-copy, .sun-lab .sun-instrument { grid-column: 1; grid-row: auto; }
+  .sun-lab .sun-copy { max-width: 31rem; }
+  .water-work { display: grid; padding: 10px 13px; bottom: max(26px,env(safe-area-inset-bottom)); }
+  .water-work a { min-height: 44px; margin: 0; }
+}
+@media(prefers-reduced-motion:reduce){ .water-work {display:none} }
+
+/* The case selector and its live screen sit in the same dark gallery as the book. */
+.page-main-home .home-cases, .page-main.archive-route {
+  --sea-ink: #f3f8ff; --sea-muted: #c2d5e8; --sea-link: #aadaff;
+  --sea-line: #53718b; --sea-wash: #172f47;
+  background: linear-gradient(157deg,#0c2139 0%,#0b1d31 57%,#0b1b29 100%);
+  color: var(--sea-ink);
+}
+.home-cases .archive-banner { margin-bottom: 0; }
+.home-cases .project-archive { padding-top: clamp(28px, 4vw, 72px); }
+.project-archive .archive-cover {
+  border: 1px solid #b9dbf5a1; border-radius: 13px;
+  box-shadow: 0 20px 42px -26px #000c, 0 0 0 5px #a9d5f009;
+}
+.project-archive .archive-index { border-color: #95b5d18c; }
+.project-archive .archive-index button { padding-inline: clamp(10px, 1.4vw, 24px); }
+.project-archive .archive-index button[aria-selected=true] {
+  color: white; background: linear-gradient(104deg,#427da570,#628baf1c);
+  box-shadow: inset 2px 0 #b6edff;
+}
+.project-archive .archive-selection { color: #b6edff; }
+.page-main.archive-route { --shore: max(5vw,calc((100% - 1320px)/2)); width: 100%; padding: 0 0 clamp(42px,6vw,90px); }
+.archive-route .projects { padding-inline: var(--shore); }
+.archive-route .archive-banner h1 { font: 600 clamp(50px,8vw,138px)/.98 var(--type-display); letter-spacing: -.06em; color: #eff8ff; }
+@media(max-width:760px){
+  .business-intro h2 { font: 650 clamp(35px,9vw,66px)/.98 var(--type-interface); letter-spacing: -.055em; max-width: 100%; text-wrap: balance; }
+  .business-intro { align-items: stretch; }
+  .business-intro .business-contact-link { align-self: flex-start; }
+  .water-frame .water-progress { bottom: auto; top: 112px; right: 12px; background: #eef8ffb8; }
+  [data-theme=dark] .water-frame .water-progress { background: #102b3ccc; }
+  .project-archive .archive-index button { padding-left: .45rem; padding-right: .45rem; }
+}
+.project-archive .archive-heading .water-figure {
+  width: clamp(80px, 9vw, 144px);
+  background: radial-gradient(ellipse at center, #79b9df2e, #81a9c111 55%, transparent 72%);
+}
+.project-archive .archive-heading .water-book { width: clamp(104px, 13vw, 200px); }
+@media(max-width:420px){
+  .page-main .archive-banner h2 { font-size: clamp(34px, 9.6vw, 43px); max-width: 100%; }
+}
+
+/* The same surface is visible on each side of a scene boundary. */
+.page-main-home {
+  --air: #eaf3f8;
+  --studio-edge: #cfe6f5;
+  --gallery-depth: #0c2139;
+  --instrument-depth: #071b27;
+}
+[data-theme=dark] .page-main-home {
+  --air: #102637;
+  --studio-edge: #183548;
+}
+.water-frame::after {
+  content: ''; position: absolute; pointer-events: none; z-index: 1;
+  inset: auto 0 0; height: min(32vh, 240px); opacity: var(--shore-mix, 0);
+  background: linear-gradient(transparent, var(--studio-edge));
+}
+.business-about { background-color: var(--air); }
+.business-intro { background-color: var(--studio-edge); }
+.business-intro .scene-art {
+  mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 69%, transparent);
+}
+.business-intro::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(var(--studio-edge), transparent 15%, transparent 80%, var(--air));
+}
+.services-ledger { background: var(--air); padding-bottom: clamp(32px, 4vw, 66px); }
+[data-theme=dark] .business-intro { color: #f2f9ff; }
+[data-theme=dark] .business-intro::before { background:linear-gradient(90deg,#142f42f5,#142f42ce 29%,#193c5070 57%,transparent 80%); }
+[data-theme=dark] .business-intro .panel-label, [data-theme=dark] .business-intro > p:not(.panel-label) {color:#e2f1fa}
+[data-theme=dark] .business-intro .business-contact-link {background:#e5f4fc;color:#15384b}
+.page-main-home .archive-banner {
+  --waterline-height: clamp(135px, 15vw, 250px);
+  background: var(--gallery-depth);
+  min-height: clamp(455px, 42vw, 755px);
+  padding-block: calc(var(--waterline-height) + 1.15rem) clamp(32px, 5vw, 82px);
+}
+.home-cases .archive-banner > .scene-art {
+  inset: auto 0 0; height: calc(100% - var(--waterline-height) * .38);
+  object-position: 68% 54%;
+  mask-image: linear-gradient(transparent, black 32%, black 78%, transparent);
+}
+.home-cases .archive-banner::before {
+  mask-image: linear-gradient(transparent 8%, black 50%, black 85%, transparent);
+}
+.archive-waterline {
+  position:absolute; z-index:-1; pointer-events:none; inset:0 0 auto;
+  height:calc(var(--waterline-height) * 1.16); overflow:hidden;
+  background:linear-gradient(var(--air),var(--gallery-depth));
+  mask-image:linear-gradient(#000 47%,#000e 60%,transparent);
+}
+.archive-waterline :is(img, canvas) {
+  display:block; width:100%; height:100%; object-fit:cover; object-position:50% 49%;
+  mask-image:linear-gradient(transparent, black 26%, black 67%, transparent);
+}
+[data-theme=dark] .archive-waterline :is(img, canvas) {filter:brightness(.53) saturate(.75)}
+.home-cases .project-archive {padding-top:clamp(14px,2.4vw,42px)}
+.page-main-home .home-cases {background:linear-gradient(var(--gallery-depth) 62%, #0a1927)}
+.page-main-home .skills-marquee {background:#0a1927}
+.conduit-art {mask-image:linear-gradient(transparent,black 22%,black 68%,transparent)}
+.page-main-home .sun-lab {
+  background-color:var(--instrument-depth);
+  background-image:linear-gradient(#0a1927,transparent 30%,transparent 71%,var(--instrument-depth)),url('/environment/optical-prism.webp');
+}
+.horizon-contact {
+  background:#071b27 url('/environment/ray-water.webp') center 58% / cover;
+  padding-top:clamp(112px,13vw,205px);
+}
+.horizon-contact .horizon-lake {mask-image:linear-gradient(transparent 6%,#0004 34%,#000d 65%,#000)}
+.horizon-contact::before {
+  content:''; pointer-events:none; position:absolute; z-index:-1; inset:0 0 auto; height:24%;
+  background:linear-gradient(#071b27,transparent);
+}
+.water-journal[data-motion=on] .journal-thread { opacity:.26; mask-image:linear-gradient(transparent,#000 5%,#000 93%,transparent); }
+@media(prefers-reduced-motion:no-preference){
+  .page-main-home .business-intro .scene-art,.page-main-home .archive-banner > .scene-art,
+  .page-main-home .conduit-art .scene-art {
+    transform: translateY(calc((.5 - var(--passage,.5)) * 36px)) scale(1.075);
+  }
+  .archive-waterline :is(img, canvas) {transform: translateY(calc((var(--passage,.5) - .5) * 18px)) scale(1.09)}
+}
+@media(max-width:760px){
+  .page-main-home .archive-banner {
+    --waterline-height: 110px; min-height: 440px;
+    padding: 158px var(--shore) 36px;
+  }
+  .home-cases .archive-banner > .scene-art {object-position:70% 50%}
+  .business-intro .scene-art {mask-image:linear-gradient(transparent,#000 12%,#000 68%,transparent)}
+  [data-theme=dark] .business-intro::before {background:linear-gradient(0deg,var(--air),#142f42f2 25%,#163547b0 60%,transparent)}
+}
+
+.archive-waterline canvas {position:absolute;inset:0}
+.archive-waterline canvas[hidden] {display:none}

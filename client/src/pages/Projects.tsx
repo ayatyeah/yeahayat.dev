@@ -1,13 +1,17 @@
+import { useLang } from '../lib/language';
 import ProjectShowcase from '../components/ProjectShowcase';
 
 export default function Projects() {
+  const kk = useLang() === 'kk';
   return (
-    <main className="page-main">
-      <section className="page-head reveal">
-        <h1 className="page-title">Проекты</h1>
+    <main className="page-main archive-route">
+      <section className="page-head archive-banner">
+        <img className="scene-art" src="/environment/ocean-descent-small.webp" alt="" width="760" height="1344" style={{objectPosition:'50% 39%'}} />
+        <h1 className="page-title">{kk ? 'Жобалар' : 'Проекты'}</h1>
+        <p className="business-case-note">{kk ? 'Жобаны таңдап, оның интерфейсін және атқарған жұмысымды көріңіз.' : 'Выберите проект, чтобы посмотреть интерфейс и мою работу над ним.'}</p>
       </section>
 
-      <section className="projects reveal" id="projects">
+      <section className="projects" id="projects">
         <ProjectShowcase />
       </section>
     </main>

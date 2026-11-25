@@ -1,7 +1,15 @@
+import { createRequire } from 'node:module';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+const resolveModule = createRequire(import.meta.url).resolve;
+
+export default defineConfig(({ command }) => ({
+  // Keep animation and glTF-only Three modules in the on-demand folio chunk.
+  resolve: command === 'build' ? {
+    alias: [{ find: /^three$/, replacement: resolveModule('three/src/Three.js') }]
+  } : undefined,
+  optimizeDeps: { include: ['three/examples/jsm/loaders/GLTFLoader.js'] },
   plugins: [react()],
   server: {
     proxy: {
@@ -20,4 +28,4 @@ export default defineConfig({
       }
     }
   }
-});
+}));

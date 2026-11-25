@@ -1,0 +1,24 @@
+/* Clear sunlit edges keep the volume visible; the type sits in calmer water. */
+.ocean-backdrop .ocean-shade {
+  background:
+    radial-gradient(ellipse at 50% 65%,#10384d49,transparent 61%),
+    linear-gradient(180deg,#94b9c511,transparent 42%,#b9cec00a);
+}
+[data-theme=dark] .ocean-backdrop .ocean-shade {
+  background:
+    radial-gradient(ellipse at 50% 60%,#071c3766,transparent 66%),
+    linear-gradient(155deg,#122d526a,#0b263956 62%,#102a465e);
+}
+.ocean-backdrop .ocean-current > b {
+  mask-image:linear-gradient(90deg,#000 0%,#000 13%,transparent 31%,transparent 69%,#000 90%);
+}
+.ocean-backdrop .ocean-current > i {
+  mask-image:linear-gradient(100deg,transparent 54%,#000 87%);
+}
+.ocean-backdrop .ocean-column img {filter:saturate(.85) contrast(.96);}
+@media(max-width:700px) {
+  .ocean-backdrop .ocean-air span:nth-child(3) {display:none;}
+  .ocean-backdrop .ocean-shade {background:radial-gradient(ellipse at 50% 60%,#12384e50,transparent 70%);}
+}
+
+body[data-scene-covered] .ocean-backdrop * { animation-play-state: paused; }

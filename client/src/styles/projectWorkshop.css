@@ -1,0 +1,35 @@
+.page-main-home .project-workshop { padding-block: clamp(38px, 5vw, 82px); }
+.workshop-stage { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(240px, .9fr); align-items: center; gap: clamp(24px, 6vw, 100px); }
+.project-workshop .conduit-art { inset: -20% -8% -15% 35%; opacity: .56; pointer-events: none; }
+.workshop-story { min-width: 0; }
+.workshop-caption { margin: 0 0 1.1em; font: 500 1rem/1.35 var(--type-interface); color: #b5d4df; }
+.workshop-story h2 { margin: 0; color: #f2fcff; font: 520 clamp(2.5rem, 5.4vw, 6.8rem)/1.03 var(--type-display); letter-spacing: -.055em; overflow-wrap: anywhere; }
+#workshop-result { min-height: 5.2em; max-width: 43ch; margin-block: 1.1em .35em; }
+#workshop-result p { margin: 0; font: 430 clamp(1rem, 1.3vw, 1.3rem)/1.5 var(--type-interface); color: #d8eaf0; }
+.workshop-return { color: #bbebfb; text-decoration-thickness: 1px; text-underline-offset: .25em; }
+.workshop-tools { display: flex; justify-content: center; gap: clamp(12px, 2vw, 28px); min-width: 0; }
+.workshop-tool { min-width: 0; }
+.workshop-tool .workshop-select, .workshop-tool .workshop-static {
+  display: grid; align-content: end; justify-items: center; gap: .22rem; border: 0; border-radius: 12px; padding: .3rem;
+  width: clamp(94px, 10vw, 156px); height: auto; aspect-ratio: auto; cursor: pointer;
+  background: radial-gradient(ellipse at 52% 39%,#87d9fa38,transparent 65%); font: 540 clamp(.86rem,1.1vw,1rem)/1.4 var(--type-interface); color: #b9d5e3;
+}
+.workshop-select canvas { width: 100%; aspect-ratio: 1; height: auto; }
+.workshop-tool .workshop-select[aria-pressed=true] span,.workshop-tool .workshop-static[aria-pressed=true] { color:#fff; text-decoration: underline; text-underline-offset:.35em; }
+.workshop-tool .workshop-select[hidden],.workshop-tool .workshop-static { display: none; }
+.workshop-tool .workshop-select[hidden] + .workshop-static { display: grid; min-height: 52px; }
+.workshop-kit { margin-top: clamp(25px, 4vw, 56px); border-top: 1px solid #89a7b740; color:#d8eaf0; }
+.workshop-kit summary { cursor:pointer; width:fit-content; max-width:100%; padding-block:16px; font-weight:530; }
+.workshop-kit dl { margin:0; }
+.workshop-kit dl > div { display:flex; flex-wrap:wrap; gap: .25rem 1.75rem; margin:.5rem 0; }
+.workshop-kit dt { color:#a6c4d2; }
+.workshop-kit dd { margin:0; }
+@media(prefers-reduced-motion:no-preference) {
+  #workshop-result p { animation: workshop-read .25s ease-out; }
+  @keyframes workshop-read { from { opacity: .35; transform: translateY(3px); } }
+}
+@media(max-width:700px) {
+  .workshop-stage { grid-template-columns: minmax(0,1fr); gap: 16px; }
+  .project-workshop .conduit-art { inset: 0 -9% -4% 12%; opacity: .42; }
+  .workshop-tools { justify-content: start; }
+}

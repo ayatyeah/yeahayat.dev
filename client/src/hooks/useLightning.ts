@@ -120,8 +120,9 @@ function burst(rect: DOMRect, out: Bolt[]) {
   out.push(edgeArc(rect), edgeArc(rect), edgeArc(rect));
 }
 
-export function useLightning() {
+export function useLightning(enabled = true) {
   useEffect(() => {
+    if (!enabled) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const canvas = document.createElement('canvas');
@@ -291,5 +292,5 @@ export function useLightning() {
       hovered?.classList.remove('is-charged');
       canvas.remove();
     };
-  }, []);
+  }, [enabled]);
 }

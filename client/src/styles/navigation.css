@@ -1,0 +1,169 @@
+.tide-header,
+.tide-footer {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #10364d;
+  font-family: Arial, sans-serif;
+}
+
+.tide-header {
+  padding: clamp(18px, 2vw, 34px) 2.5vw;
+  background: linear-gradient(180deg, #bfdff6, rgb(220 240 249 / .86));
+}
+
+.tide-wordmark {
+  font-size: clamp(21px, 2.01vw, 35px);
+  font-weight: 600;
+}
+
+.tide-header nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 3vw, 56px);
+  font-size: clamp(14px, 1.65vw, 29px);
+}
+
+.tide-header a,
+.tide-footer a {
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: .22em;
+}
+
+.tide-header a:is(:hover, [aria-current="page"]),
+.tide-footer a:hover {
+  text-decoration: underline;
+}
+
+.tide-header a:focus-visible,
+.tide-footer a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.tide-footer {
+  margin-top: clamp(32px, 5vw, 84px);
+  padding: 28px max(4vw, calc((100vw - 1180px) / 2));
+  background: #d9edf7;
+  font-size: .92rem;
+  flex-wrap: wrap;
+}
+
+.tide-footer p { margin: 0; }
+
+/* The viewport snapshots dissolve together, keeping the lake and its horizon in sight. */
+.tide-transition { display: none; }
+html::view-transition-old(root) { animation: route-out 280ms ease-in-out both; }
+html::view-transition-new(root) { animation: route-in 280ms ease-in-out both; }
+@keyframes route-out { to { opacity: 0; } }
+@keyframes route-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  html::view-transition-old(root), html::view-transition-new(root) { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .tide-header { padding: 20px 16px; }
+  .tide-footer { padding: 24px 16px; }
+}
+
+@media (max-width: 355px) {
+  .tide-header { flex-wrap: wrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tide-transition { display: none; }
+}
+
+html body {
+  color: #10364d;
+  background: #f5f9fb;
+}
+
+html body::before { content: none; }
+
+.lang-switch {display:inline-flex;align-items:center;gap:1px;padding:3px;border-radius:30px;border:1px solid currentColor;color:inherit}
+.lang-switch button {appearance:none;border:0;background:transparent;color:inherit;padding:6px 7px;border-radius:20px;font:600 11px/1.1 var(--type-interface);letter-spacing:.03em;cursor:pointer}
+.lang-switch button[aria-pressed=true] {background:#103346;color:#fff}
+[data-theme=dark] .lang-switch button[aria-pressed=true] {background:#e4f8ff;color:#0d2d40}
+.lang-switch button:focus-visible {outline:2px solid #2489b3;outline-offset:1px}
+.ambient-water {position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;opacity:.63}
+.ambient-water i {position:absolute;inset:-24%;background:radial-gradient(ellipse at 28% 75%,#6fc4cf39,transparent 43%),radial-gradient(ellipse at 86% 22%,#ffd1a633,transparent 37%);animation:coast-drift 23s ease-in-out infinite alternate}
+.ambient-water i+i {opacity:.38;background:repeating-radial-gradient(ellipse 65% 126% at -28% -50%,transparent 0 11%,#9cd6d636 11.5%,transparent 12.2% 19%);animation-duration:32s;animation-direction:alternate-reverse}
+@keyframes coast-drift {from{transform:translate(-3%,1%) rotate(-4deg)}to{transform:translate(6%,-3%) rotate(4deg)}}
+[data-theme=dark] .ambient-water {opacity:.28}
+.horizon-contact {position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:clamp(290px,48vw,560px);padding:clamp(26px,8vw,140px);color:#f2faff;background:#183d59}
+.horizon-lake {position:absolute;inset:0;z-index:-2;pointer-events:none}
+.horizon-lake :is(img,video) {display:block;width:100%;height:100%;object-fit:cover;object-position:72% 58%}
+.horizon-contact::after {content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#08233fa6,transparent 88%)}
+.horizon-contact p {margin:0 0 1.2rem;font:500 clamp(15px,1.6vw,24px)/1.35 var(--type-interface)}
+.horizon-contact a {color:inherit;font:570 clamp(32px,7.8vw,130px)/1.1 var(--type-display);letter-spacing:-.065em;text-decoration:none}
+.horizon-contact a:hover {text-decoration:underline;text-decoration-thickness:.035em;text-underline-offset:.1em}
+.horizon-contact+.tide-footer {margin-top:0}
+[data-theme=dark] .horizon-contact {color:#effaff;background:#153348}
+[data-theme=dark] .horizon-lake {filter:brightness(.76)}
+[data-theme=dark] .horizon-contact::after {background:linear-gradient(90deg,#0a223c9c,transparent)}
+@media(prefers-reduced-motion:reduce){.ambient-water i {animation:none}}
+.horizon-contact .horizon-brief {max-width:50ch;margin:1.2rem 0;font:450 clamp(15px,1.42vw,20px)/1.5 var(--type-interface)}
+.horizon-links {display:flex;gap:24px}
+.horizon-links a {font:600 15px/1.5 var(--type-interface);letter-spacing:normal}
+body:is([data-page=projects], [data-page=contact]) .tide-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 7;
+  color: #f0f8ff;
+  background: linear-gradient(180deg, #07182ec9, #07182e5c 65%, transparent);
+}
+body:is([data-page=projects], [data-page=contact]) .tide-header .lang-switch button[aria-pressed=true] {
+  background: #e9f5fb;
+  color: #173248;
+}
+body[data-page=projects] .archive-route .archive-banner { padding-top: clamp(105px,12vw,180px); }
+body[data-page=contact] .page-main {
+  isolation: isolate;
+  padding-top: clamp(82px,8vw,130px);
+}
+body[data-page=contact] .page-main::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  inset: 0 calc(50% - 50vw) auto;
+  height: min(85vh, 820px);
+  background: linear-gradient(180deg,#122b4338 10%, #173c5199 39%, var(--sea-paper) 88%),
+    url('/environment/steppe-dusk.webp') 72% 58% / cover;
+}
+body[data-page=contact] .page-title { color: #f7fcff; }
+body[data-page=contact] .contact-board {
+  padding: clamp(8px,1.1vw,16px) clamp(18px,3vw,42px);
+  margin-bottom: clamp(30px,5vw,72px);
+  background: color-mix(in srgb, var(--sea-paper) 89%, transparent);
+  border-radius: 18px;
+}
+body[data-page=contact] .contact-row:first-child { border-top: 0; }
+body[data-page=contact] .contact-row:last-child { border-bottom: 0; }
+@media(max-width:540px) {
+  body[data-page=contact] .page-main { padding-top: 106px; }
+  body[data-page=projects] .archive-route .archive-banner { padding-top: 128px; }
+}
+body[data-page=contact] .form-shell {background:linear-gradient(125deg,#fbffffc4,#deedf4db);border:1px solid #c4dde4;box-shadow:inset 0 1px 0 #fff,0 15px 55px #356b7a10}
+[data-theme=dark] body[data-page=contact] .form-shell {background:linear-gradient(125deg,#1b3947df,#112a39ed);border-color:#3c5966;box-shadow:inset 0 1px 0 #a0d5e32b}
+
+:is(.water-nav, .tide-header) .lang-switch button {
+  font-size: .765625rem;
+  line-height: 1.2;
+  letter-spacing: .015em;
+}
+@media (pointer: coarse) and (min-width: 761px) {
+  :is(.page-main-home .water-nav, .tide-header) nav > a,
+  :is(.page-main-home .water-nav, .tide-header) :is(.lang-switch button, .theme-toggle) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

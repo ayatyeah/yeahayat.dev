@@ -1,0 +1,51 @@
+.services-ledger.service-workbench {
+  display:grid;
+  grid-template-columns:minmax(0,.91fr) minmax(0,1.09fr);
+  align-items:center;
+  gap:clamp(32px,6vw,96px);
+}
+.service-workbench .workbench-controls h3 {margin-bottom:clamp(20px,2.5vw,38px)}
+.workbench-options {
+  display:flex; flex-wrap:wrap; gap:0 1rem; margin:0; padding:0; border:0; min-width:0;
+}
+.workbench-options label {position:relative; cursor:pointer}
+.workbench-options input {
+  position:absolute; inline-size:1px; block-size:1px; overflow:hidden; clip-path:inset(50%);
+}
+.workbench-options span {
+  display:flex; align-items:center; min-height:44px; border-bottom:2px solid transparent;
+  color:var(--sea-muted); font:500 clamp(.91rem,1.15vw,1.06rem)/1.35 var(--type-interface);
+}
+.workbench-options input:checked + span {color:var(--sea-ink); border-color:currentColor}
+.workbench-options input:focus-visible + span {outline:2px solid var(--sea-link);outline-offset:2px}
+.workbench-explanation {display:grid; margin-block-start:1rem}
+.workbench-answer {grid-area:1/1;visibility:hidden}
+.workbench-answer[data-active=true] {visibility:visible}
+.workbench-answer p {
+  max-width:44ch; margin:0; color:var(--sea-muted);
+  font:450 clamp(1rem,1.25vw,1.18rem)/1.55 var(--type-interface);
+}
+.workbench-answer a {
+  display:inline-flex; align-items:center; min-height:44px; margin-top:.4em;
+  color:var(--sea-link); font-weight:570; text-decoration:underline; text-underline-offset:.28em;
+}
+.workbench-preview {min-width:0;margin:0}
+.workbench-display {
+  overflow:hidden; aspect-ratio:16/9; border-radius:clamp(8px,1vw,15px);
+  background:var(--sea-wash); border:1px solid var(--sea-line);
+  box-shadow:0 20px 28px -24px #1836486b;
+}
+.workbench-display img {display:block; width:100%; height:100%; object-fit:cover;object-position:top}
+.workbench-preview figcaption {
+  display:flex; flex-wrap:wrap; justify-content:space-between; gap:.2rem 1rem;
+  padding:.7rem .15rem 0; font:450 .85rem/1.45 var(--type-interface); color:var(--sea-muted)
+}
+.workbench-preview figcaption b {color:var(--sea-ink);font-weight:600}
+@media(prefers-reduced-motion:no-preference){
+  .workbench-display img,.workbench-answer[data-active=true] {animation:workbench-focus 250ms ease-out both}
+  @keyframes workbench-focus {from{opacity:.5}to{opacity:1}}
+}
+@media(max-width:760px){
+  .services-ledger.service-workbench {grid-template-columns:minmax(0,1fr);gap:20px}
+  .workbench-options {gap:0 .85rem}
+}

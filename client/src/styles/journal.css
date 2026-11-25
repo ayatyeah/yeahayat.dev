@@ -1,0 +1,75 @@
+.water-journal {
+  --gutter:clamp(42px,6vw,82px);
+  position:relative;isolation:isolate;padding-left:var(--gutter);padding-bottom:6vh;
+}
+.journal-shore {
+  position:absolute;pointer-events:none;inset:-35px calc(50% - 50vw) auto;height:clamp(220px,31vw,440px);z-index:-1;
+  background:radial-gradient(ellipse at 14% -70%,#81cdd4 0%,transparent 70%),linear-gradient(#bae3e5aa,transparent);
+}
+[data-theme=dark] .journal-shore {background:radial-gradient(ellipse at 14% -70%,#197785,transparent 72%),linear-gradient(#104b5e99,transparent)}
+.journal-thread {position:absolute;left:0;top:0;width:var(--gutter);height:100%;pointer-events:none;overflow:visible;opacity:0}
+.water-journal[data-motion=on] .journal-thread {opacity:1}
+.thread-bed,.thread-light {fill:none;stroke-width:1.4;stroke-linecap:round}
+.thread-bed {color:var(--sea-line);stroke:currentColor;opacity:.42}
+.thread-light {stroke:#5aabb7}
+.water-journal .impact-grid {border-top:0;min-height:62vh;align-content:center}
+.water-journal .skills-marquee {padding-block:clamp(50px,8vw,120px)}
+.journal-skills {margin-top:clamp(28px,4vw,65px)}
+.journal-skill-row {display:grid;grid-template-columns:minmax(12em,.9fr) 1.45fr;gap:18px;align-items:baseline;padding:clamp(16px,2.2vw,32px) 0;border-top:1px solid var(--sea-line);position:relative}
+.journal-skill-row h3,.journal-skill-row p {margin:0;line-height:1.45}
+.journal-skill-row h3 {font-size:clamp(18px,2vw,28px);color:var(--sea-ink)}
+.journal-skill-row p {font-size:clamp(15px,1.5vw,22px);color:var(--sea-muted)}
+@media(prefers-reduced-motion:no-preference){
+  .water-journal[data-motion=on] .business-intro h2,
+  .water-journal[data-motion=on] .journal-skill-row p,
+  .water-journal[data-motion=on] .archive-heading {
+    transform:translateY(calc((1 - var(--enter,1)) * 20px));
+  }
+  .water-journal[data-motion=on] .journal-skill-row::before {
+    content:'';position:absolute;pointer-events:none;inset:0;z-index:1;
+    transform:translateX(calc((var(--enter,1) * 2 - 1) * 110%));
+  }
+  .water-journal[data-motion=on] .journal-skill-row::before {height:2px;background:linear-gradient(90deg,transparent,#49a7b5,transparent)}
+  .journal-skill-row {overflow:hidden}
+}
+@media(max-width:740px){
+  .water-journal {--gutter:26px}
+  .journal-skill-row {grid-template-columns:minmax(0,1fr);gap:6px}
+  .water-journal .impact-grid {min-height:auto}
+}
+@media(prefers-reduced-motion:reduce){.water-journal .journal-thread {display:none}}
+.journal-tools-head {display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.35fr);align-items:center;gap:12px}
+.water-tools {height:clamp(150px,17vw,260px);position:relative;background:radial-gradient(ellipse at 55% 82%,#67a9ba24,transparent 55%)}
+.water-tools canvas {display:block;width:100%;height:100%}
+@media(max-width:600px){
+  .journal-tools-head {grid-template-columns:1fr}
+  .water-tools {height:150px}
+}
+.water-tools {display:flex;justify-content:center;align-items:center}
+.water-figure {display:block;flex:none;width:clamp(62px,6.8vw,104px);aspect-ratio:1;padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation;border-radius:28%}
+.water-figure canvas {display:block;width:100%;height:100%;pointer-events:none}
+.water-tools .water-figure {width:min(45%,170px)}
+.case-identity {display:flex;align-items:center;justify-content:space-between;gap:8px}
+.case-identity h3 {min-width:0;overflow-wrap:anywhere}
+.water-figure:focus-visible {outline:2px solid var(--sea-link);outline-offset:2px}
+.water-figure[hidden] {display:none}
+@media(max-width:600px){.water-tools .water-figure {width:min(45%,132px)}}
+
+/* On the archive route the cover and its caption settle together as they enter. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion:no-preference) {
+    .projects .project-archive {
+      animation: case-surface linear both;
+      animation-timeline:view();
+      animation-range: entry 0% entry 75%;
+    }
+    @keyframes case-surface {
+      from {translate:0 22px;opacity:.72}
+      to {translate:0 0;opacity:1}
+    }
+  }
+}
+
+.journey-lens {position:fixed;inset:0;width:100%;height:100%;z-index:6;pointer-events:none}
+.journey-lens[hidden] {display:none}
+@media(prefers-reduced-motion:reduce),(forced-colors:active){.journey-lens{display:none}}

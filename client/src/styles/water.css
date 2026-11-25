@@ -1,0 +1,159 @@
+.water-track { position:relative; height:480vh; height:480svh; width:100vw; justify-self:center }
+.water-frame { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:#91b6dc; color:#092942; isolation:isolate }
+.water-art { position:absolute; inset:0; background:linear-gradient(#68a1dd,#d7edff) }
+.water-art canvas { display:block; width:100%; height:100% }
+.water-fallback { display:none; }
+.water-art[data-fallback=true] .water-fallback {
+  position:absolute; inset:0; display:flex; justify-content:center; align-items:center;
+}
+.water-fallback b {
+  --lane:148vw; --focus-x:-22vw;
+  width:24vw; text-align:center; color:transparent; font:700 27vw/1 var(--type-interface);
+  background:url('/environment/optical-sky.webp') center bottom / 125% auto;
+  background-clip:text; -webkit-text-stroke:1px #cdecff; filter:drop-shadow(0 2px 3px #163c699c);
+  transform:translateX(calc(var(--letter-enter,0) * (var(--focus-x) + (var(--index) - var(--letter-focus,0)) * var(--lane) - (var(--index) - 1.5) * 24vw)))
+    scale(calc(1 + .6 * var(--letter-enter,0)));
+}
+.water-fallback b:nth-child(1){--index:0}
+.water-fallback b:nth-child(2){--index:1}
+.water-fallback b:nth-child(3){--index:2}
+.water-fallback b:nth-child(4){--index:3}
+@media(max-width:700px){
+  .water-fallback b {--lane:100vw; --focus-x:0vw;
+    translate:0 calc(-22svh * var(--letter-enter,0));}
+}
+.water-frame a { color:inherit; text-decoration:none }
+.water-frame a:hover { text-decoration:underline; text-underline-offset:.18em }
+.water-nav,.water-work {position:absolute;z-index:3;font:500 clamp(15px,1.3vw,23px)/1.2 var(--type-interface,Arial,sans-serif)}
+.water-nav {inset:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:clamp(17px,2vw,34px) 2.5vw}
+.water-nav nav {display:flex;align-items:center;gap:clamp(12px,2.3vw,40px)}
+.water-nav>a {font-size:1.22em;font-weight:650}
+.water-work {bottom:4%;left:2.5%}
+.water-sr {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.page-main.page-main-home {padding-top:0;grid-template-columns:minmax(0,1fr)}
+.page-main-home > * {min-width:0}
+
+.water-chapters {
+  --appear:0; --shine:15%; --turn:0deg;
+  position:absolute; inset:22% 7% 16% 43%; opacity:var(--appear); pointer-events:none;
+  transform:perspective(1300px) rotateY(calc(-6deg + var(--turn))) rotateZ(-1.2deg) translateY(calc((1 - var(--appear)) * 34px));
+}
+.water-glass {
+  position:absolute; inset:0; border-radius:4% 2% 3% 2% / 3% 6% 3% 4%;
+  background:linear-gradient(125deg,#ffffff64 2%,#e2f8ff50 16%,#f0fbff89 44%,#e7f9ff9c 70%,#a0daea4a);
+  backdrop-filter:blur(1.5px) saturate(1.2);
+  border:1px solid #f5ffffc7;
+  box-shadow:inset 2px 3px 3px #ffffffe0,inset -3px -4px 4px #1976997a,inset -5px -6px 8px #ffffff75,2px 7px 12px -7px #02394a85;
+}
+.water-glass::after {content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(118deg,transparent calc(var(--shine) - 22%),#fff7 var(--shine),transparent calc(var(--shine) + 12%));
+  mask-image:linear-gradient(#000,transparent 14%,transparent 77%,#000)}
+.water-chapter {position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,2vh,26px);padding:clamp(24px,4vw,70px);
+  opacity:var(--face,0);transform:translateY(var(--shift,0));color:#082c41}
+.water-chapter:not([inert]) a {pointer-events:auto}
+.water-chapter-copy h2 {font:700 clamp(36px,5.5vw,102px)/1.00 var(--type-interface,Arial,sans-serif);letter-spacing:-.06em;margin:0;text-wrap:balance;color:inherit}
+.water-chapter-copy p {font:500 clamp(15px,1.45vw,25px)/1.45 var(--type-interface,Arial,sans-serif);max-width:40ch;margin:1.2em 0 0;color:inherit}
+.water-progress {position:absolute;bottom:4%;right:3%;display:flex;gap:8px;pointer-events:none;color:inherit}
+[data-theme=dark] .water-glass {background:linear-gradient(125deg,#102b41a8,#174662ad 58%,#28567491)}
+[data-theme=dark] .water-chapter {color:#f4fcff}
+@media(max-width:700px){
+  .water-track {height:440svh}
+  .water-nav {padding:14px 12px;font-size:13px;align-items:flex-start}
+  .water-nav nav {gap:9px;justify-content:flex-end;flex-wrap:wrap}
+  .water-nav>a {margin-right:14px;line-height:30px}
+  .water-nav nav>a {line-height:30px}
+  .water-nav .theme-toggle {width:28px;height:28px}
+  .water-chapters {inset:45% 6% 9% 6%;transform:perspective(950px) rotateY(var(--turn)) rotateZ(-1deg)}
+  .water-chapter {padding:clamp(18px,5vw,32px)}
+  .water-chapter-copy h2 {font-size:clamp(33px,8.5vw,56px)}
+  .water-chapter-copy p {font-size:clamp(14px,3.6vw,20px);margin:.7em 0 0}
+  .water-work {left:16px;bottom:22px}
+}
+@media(max-height:570px) and (orientation:landscape){
+  .water-chapters {inset:18% 5% 9% 45%}
+  .water-chapter {padding:14px 24px}
+  .water-chapter-copy h2 {font-size:clamp(22px,4vw,34px)}
+  .water-chapter-copy p {font-size:13px;margin:.4em 0}
+}
+@media(prefers-reduced-motion:reduce){
+  .water-track,.water-frame {height:auto}
+  .water-frame {position:relative;overflow:visible;padding-top:85svh}
+  .water-art {height:85svh}
+  .water-chapters {position:relative;inset:auto;opacity:1;transform:none;background:linear-gradient(#d8edf6,#edf8fb);padding:0 max(6vw,20px);display:grid;}
+  .water-glass,.water-progress,.water-work {display:none}
+  .water-chapter {inset:auto;position:relative;opacity:1;transform:none;padding:32px 0;pointer-events:auto;border-bottom:1px solid #24587735}
+  .water-chapter-copy h2 {font-size:clamp(30px,5vw,68px)}
+  [data-theme=dark] .water-chapters {background:#122d3d}
+}
+.water-progress {right:clamp(76px,7vw,110px)}
+@media(max-width:540px){
+  .water-nav {display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px}
+  .water-nav nav {display:grid;grid-template-columns:repeat(3,auto);gap:3px 10px;align-items:center}
+  .water-nav .lang-switch {grid-column:2;justify-self:end}
+  .water-nav .theme-toggle {grid-column:3;justify-self:end}
+  .water-nav>a {align-self:start}
+}
+
+/* The four principles share one edge of glass, with the sky visible through its body. */
+@media(prefers-reduced-motion:no-preference) {
+  .page-main-home .water-track { height:330vh; height:330svh }
+  .water-frame .water-work { opacity:var(--cue,1); }
+  .water-frame .water-chapters {
+    inset: auto 6% 20% 47%; height:45%;
+    transform:translateY(calc((1 - var(--appear)) * 22px)); isolation:isolate;
+  }
+  .water-frame .water-glass {
+    inset:0; z-index:-1; border:0; border-radius:0; backdrop-filter:none; box-shadow:none;
+    background:linear-gradient(107deg,#effaffcb,#e2f4ffb5 58%,#e4fbff29);
+    mask-image:linear-gradient(100deg,transparent,#000 8%,#000 74%,transparent);
+  }
+  .water-frame .water-glass::after {
+    inset:0 5% auto; height:1px; mask:none;
+    background:linear-gradient(90deg,transparent,#fff 9%,#a4e1ef 30%,#fff7c7 70%,transparent);
+  }
+  .water-frame .water-chapter { padding:clamp(18px,3.2vw,58px); }
+  .water-frame .water-chapter-copy h2 { font-size:clamp(35px,4.9vw,88px); line-height:.99; }
+  [data-theme=dark] .water-frame .water-glass {
+    background:linear-gradient(104deg,#102e48e8,#15384cdb 64%,#173d5266);
+  }
+}
+.water-principle {
+  display:block; margin-bottom:.85rem; font:550 clamp(12px,1.04vw,16px)/1.1 var(--type-interface),sans-serif;
+  text-transform:uppercase; letter-spacing:.11em;
+}
+.water-frame .water-handoff {
+  display:inline-flex; align-items:center; min-height:44px; margin-top:.4rem;
+  color:inherit; font-size:.95rem; font-weight:600; text-decoration:underline; text-underline-offset:.3em;
+}
+.water-frame .water-progress {
+  gap:1px; pointer-events:auto; padding:0;
+}
+.water-progress button {
+  appearance:none; border:0; border-bottom:1px solid currentColor; background:transparent; cursor:pointer;
+  font:600 .8rem/1 var(--type-interface),sans-serif; color:inherit; position:relative;
+  min-height:44px; min-width:44px;
+}
+.water-progress button::after {
+  content:''; position:absolute; inset:auto 0 -1px; height:3px;
+  transform:scaleX(0); background:currentColor;
+}
+.water-progress button[aria-current]::after {transform:scaleX(1)}
+@media (prefers-reduced-motion:no-preference) {
+  .water-progress button::after {transition:transform .24s ease-out}
+}
+@media(max-width:700px) and (prefers-reduced-motion:no-preference) {
+  .page-main-home .water-track {height:305svh}
+  .water-frame .water-chapters { inset:43% 4% 14%; height:auto; }
+  .water-frame .water-chapter {padding:12px 6vw}
+  .water-frame .water-chapter-copy h2 {font-size:clamp(30px,8.2vw,47px)}
+  .water-principle {margin-bottom:.5rem}
+}
+@media(max-width:540px) {
+  .water-frame .water-progress { right:15px; bottom:78px; }
+}
+@media (max-height:520px) and (orientation:landscape) and (prefers-reduced-motion:no-preference) {
+  .water-frame .water-chapters {inset:18% 4% 14% 44%;height:auto;}
+  .water-frame .water-chapter {padding:12px 5%}
+  .water-frame .water-chapter-copy h2 {font-size:clamp(23px,4vw,44px)}
+  .water-principle {margin-bottom:.4rem}
+}

@@ -1,25 +1,27 @@
+import { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import Projects from './pages/Projects';
-import Contact from './pages/Contact';
-import GitHubPage from './pages/GitHubPage';
-import Privacy from './pages/Privacy';
 import { TransitionProvider } from './lib/transition';
+import { routeModules } from './lib/routeModules';
+
+function Page({ module }: { module: typeof routeModules['/'] }) {
+  const Component = module.read();
+  return <Component />;
+}
 
 export default function App() {
   return (
-    <TransitionProvider>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/github" element={<GitHubPage />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
-    </TransitionProvider>
+    <Suspense fallback={<main aria-busy="true" style={{ minHeight: '100svh' }} />}>
+      <TransitionProvider>
+        <Layout>
+          <Routes>
+            {Object.entries(routeModules).map(([path, module]) =>
+              <Route key={path} path={path} element={<Page module={module} />} />
+            )}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
+      </TransitionProvider>
+    </Suspense>
   );
 }

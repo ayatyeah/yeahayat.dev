@@ -1,0 +1,48 @@
+/* A soft patch of sky carries the caption and progress marks over moving water. */
+.water-frame .water-work,
+.water-frame .water-progress {
+  --caption-ink: #12334c;
+  --caption-mist: #edf8ff;
+  isolation: isolate;
+  color: var(--caption-ink);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  text-shadow: 0 1px 3px var(--caption-mist);
+}
+[data-theme=dark] .water-frame .water-work,
+[data-theme=dark] .water-frame .water-progress {
+  --caption-ink: #f1f9fe;
+  --caption-mist: #102a3c;
+  background: transparent;
+}
+.water-frame .water-work::before,
+.water-frame .water-progress::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+  inset: -38px -70px;
+  background: radial-gradient(ellipse, var(--caption-mist) 10%, color-mix(in srgb, var(--caption-mist) 86%, transparent) 43%, transparent 73%);
+}
+.water-frame .water-work { padding: 0; gap: .32rem; }
+.water-work span { font-weight: 520; letter-spacing: -.035em; }
+.water-work p { font-weight: 450; line-height: 1.4; }
+.water-frame .water-progress { padding: 4px; }
+.water-frame .water-progress::before { inset: -19px -32px; }
+
+.page-main-home .water-chapter-copy h2 { font-weight: 570; letter-spacing: -.045em; line-height: 1.03; }
+.business-intro h2 { font-weight: 465; letter-spacing: -.04em; line-height: 1.01; }
+.services-ledger h3, .page-main .journal-tools-head h2 {
+  font-family: var(--type-interface);
+  font-weight: 510;
+  letter-spacing: -.044em;
+  line-height: 1.09;
+}
+.page-main .archive-banner h2, .archive-route .archive-banner h1 { font-weight: 480; line-height: 1.04; }
+.horizon-contact > div > a { font-weight: 445; letter-spacing: -.048em; }
+@media (prefers-contrast: more), (forced-colors: active) {
+  .water-frame .water-work, .water-frame .water-progress {
+    background: Canvas; color: CanvasText; text-shadow: none; outline: 1px solid; padding: .5rem;
+  }
+}

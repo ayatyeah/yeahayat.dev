@@ -1,57 +1,82 @@
-// Бесшовные переходы между страницами с фирменным YA-оверлеем.
-// Логика повторяет старый navigateSeamlessly, но поверх react-router:
-// body.page-leave → навигация → body.page-enter. Вся анимация уже описана в CSS.
+import { createContext, useCallback, useContext, useLayoutEffect, useRef, type ReactNode, type MouseEvent } from 'react';
+import { flushSync } from 'react-dom';
+import { Link, useLocation, useNavigate, useNavigationType, type LinkProps } from 'react-router-dom';
 
-import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode, type MouseEvent } from 'react';
-import { Link, useLocation, useNavigate, type LinkProps } from 'react-router-dom';
+import { getRouteModule } from './routeModules';
 
-const LEAVE_MS = 520;
-const ENTER_MS = 850;
-
-type TransitionContextValue = {
-  go: (to: string) => void;
-};
-
+type TransitionContextValue = { go: (to: LinkProps['to']) => void };
 const TransitionContext = createContext<TransitionContextValue>({ go: () => {} });
+const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export function TransitionProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const busy = useRef(false);
-  const firstRender = useRef(true);
+  const navigationType = useNavigationType();
+  const active = useRef<ReturnType<Document['startViewTransition']> | null>(null);
+  const revision = useRef(0);
+  const positions = useRef(new Map<string, number>());
+  const entry = location.key + location.pathname + location.search + location.hash;
+  const current = useRef({ entry, path: location.pathname });
 
-  // При каждой смене маршрута проигрываем page-enter (в т.ч. при первой загрузке).
-  useEffect(() => {
-    document.body.classList.remove('page-leave', 'is-routing');
-    document.body.classList.add('page-enter');
-    const timer = window.setTimeout(() => document.body.classList.remove('page-enter'), ENTER_MS);
-    if (!firstRender.current) {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  useLayoutEffect(() => {
+    const previous = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+    const save = () => positions.current.set(current.current.entry, window.scrollY);
+    const cancelSnapshot = () => {
+      ++revision.current;
+      active.current?.skipTransition();
+    };
+    window.addEventListener('scroll', save, { passive: true });
+    window.addEventListener('popstate', cancelSnapshot);
+    return () => {
+      window.history.scrollRestoration = previous;
+      window.removeEventListener('scroll', save);
+      window.removeEventListener('popstate', cancelSnapshot);
+      cancelSnapshot();
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const previous = current.current;
+    current.current = { entry, path: location.pathname };
+    if (previous.path === location.pathname) return;
+    const position = navigationType === 'POP' ? positions.current.get(entry) : 0;
+    window.scrollTo({ top: position ?? 0, behavior: 'instant' });
+    if (!active.current && !reduceMotion()) {
+      document.querySelector('main')?.animate([{ opacity: .72 }, { opacity: 1 }], {
+        duration: 210, easing: 'ease-out'
+      });
     }
-    firstRender.current = false;
-    return () => window.clearTimeout(timer);
-  }, [location.pathname]);
+  }, [entry, location.pathname, navigationType]);
 
-  const go = useCallback(
-    (to: string) => {
-      if (busy.current) return;
-      if (to === location.pathname) return;
-
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduced) {
-        navigate(to);
+  const go = useCallback(async (to: LinkProps['to']) => {
+    const path = typeof to === 'string' ? to.split(/[?#]/, 1)[0] : to.pathname;
+    if (to === location.pathname && !location.hash && !location.search) return;
+    positions.current.set(current.current.entry, window.scrollY);
+    const ticket = ++revision.current;
+    active.current?.skipTransition();
+    if (path && path !== location.pathname) {
+      try { await getRouteModule(path)?.preload(); }
+      catch {
+        if (ticket === revision.current && typeof to === 'string') window.location.assign(to);
         return;
       }
-
-      busy.current = true;
-      document.body.classList.add('is-routing', 'page-leave');
-      window.setTimeout(() => {
-        navigate(to);
-        busy.current = false;
-      }, LEAVE_MS);
-    },
-    [navigate, location.pathname]
-  );
+      if (ticket !== revision.current) return;
+    }
+    if (!path || path === location.pathname || reduceMotion() || !document.startViewTransition) {
+      navigate(to);
+      return;
+    }
+    const transition = document.startViewTransition(() => {
+      if (ticket === revision.current) flushSync(() => navigate(to));
+    });
+    active.current = transition;
+    // A superseding navigation rejects ready even when the route update succeeded.
+    void Promise.allSettled([transition.ready, transition.updateCallbackDone, transition.finished]).then(([, update]) => {
+      if (update.status === 'rejected') console.error('Route navigation failed', update.reason);
+      if (active.current === transition) active.current = null;
+    });
+  }, [navigate, location.pathname, location.hash, location.search]);
 
   return <TransitionContext.Provider value={{ go }}>{children}</TransitionContext.Provider>;
 }
@@ -60,21 +85,14 @@ export function useTransitionNav() {
   return useContext(TransitionContext);
 }
 
-// Ссылка, которая ходит через YA-переход.
 export function TransitionLink({ to, onClick, children, ...rest }: LinkProps) {
   const { go } = useTransitionNav();
-
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
-    if (event.defaultPrevented) return;
+    if (event.defaultPrevented || rest.reloadDocument || (rest.target && rest.target !== '_self')) return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault();
-    go(typeof to === 'string' ? to : to.pathname ?? '/');
+    go(to);
   };
-
-  return (
-    <Link to={to} onClick={handleClick} data-nav-link="true" {...rest}>
-      {children}
-    </Link>
-  );
+  return <Link to={to} onClick={handleClick} data-nav-link="true" {...rest}>{children}</Link>;
 }
