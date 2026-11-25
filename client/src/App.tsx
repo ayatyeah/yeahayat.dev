@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { SoundProvider } from './components/AmbientSound';
 import Layout from './components/Layout';
 import { TransitionProvider } from './lib/transition';
 import { routeModules } from './lib/routeModules';
@@ -13,15 +14,17 @@ export default function App() {
   return (
     <Suspense fallback={<main aria-busy="true" style={{ minHeight: '100svh' }} />}>
       <TransitionProvider>
-        <Layout>
-          <Routes>
-            {Object.entries(routeModules).map(([path, module]) =>
-              <Route key={path} path={path} element={<Page module={module} />} />
-            )}
-            <Route path="/work/:slug" element={<Page module={routeModules['/projects']} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Layout>
+        <SoundProvider>
+          <Layout>
+            <Routes>
+              {Object.entries(routeModules).map(([path, module]) =>
+                <Route key={path} path={path} element={<Page module={module} />} />
+              )}
+              <Route path="/work/:slug" element={<Page module={routeModules['/projects']} />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Layout>
+        </SoundProvider>
       </TransitionProvider>
     </Suspense>
   );

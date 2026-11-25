@@ -135,17 +135,17 @@ function Lightbox({ state, onClose, onStep }: { state: LightboxState; onClose: (
           {project.url && <a className="lightbox-visit" href={project.url} target="_blank" rel="noreferrer">
             {text.site} ↗
           </a>}
+          {many && (
+            <span className="lightbox-controls">
+              <button className="lightbox-nav lightbox-prev" onClick={() => onStep(-1)} aria-label={text.prev}>
+                ←
+              </button>
+              <button className="lightbox-nav lightbox-next" onClick={() => onStep(1)} aria-label={text.next}>
+                →
+              </button>
+            </span>
+          )}
         </figcaption>
-        {many && (
-          <>
-            <button className="lightbox-nav lightbox-prev" onClick={() => onStep(-1)} aria-label={text.prev}>
-              ←
-            </button>
-            <button className="lightbox-nav lightbox-next" onClick={() => onStep(1)} aria-label={text.next}>
-              →
-            </button>
-          </>
-        )}
       </figure>
       <button className="lightbox-close" onClick={event => { event.stopPropagation(); onClose(); }} aria-label={text.close}>
         ✕
@@ -301,6 +301,7 @@ export default function ProjectShowcase({ board = false, single }: { board?: boo
       import('../lib/waterFigures').then(({mountFigures})=>mountFigures(buttons,controller.signal))
         .catch(()=>buttons.forEach(button=>{
           if(button.dataset.waterFigure==='yeahgrind')button.dataset.bookFallback='true';
+          else if (button.dataset.waterFigure === 'shmagro') button.dataset.figureFallback = 'wheat';
           else button.hidden=true;
         }));
     },{rootMargin:'200px'});
@@ -336,7 +337,7 @@ export default function ProjectShowcase({ board = false, single }: { board?: boo
   </div>;
 
   return (
-    <div className="project-archive" id="featured-case">
+    <div className="project-archive" data-single={single ? true : undefined} id="featured-case">
       {!single && <div className="archive-index" role="tablist" aria-label={text.projects}>
         {PROJECTS.map((project, index) => (
           <button type="button" role="tab" key={project.slug} id={'tab-' + project.slug}
@@ -369,11 +370,11 @@ export default function ProjectShowcase({ board = false, single }: { board?: boo
               setIndex={index=>setReader({project,index})} open={index => zoom({ project, index })} />
           )}
           <div className="archive-heading">
-            <h3>{project.title}</h3>
+            {single ? <p className="case-category">{project.label[lang]}</p> : <h3>{project.title}</h3>}
             <WaterFigure kind={project.slug} />
           </div>
           <dl className="archive-detail">
-            <div><dt>{text.benefit}</dt><dd>{project.benefit[lang]}</dd></div>
+            {!single && <div><dt>{text.benefit}</dt><dd>{project.benefit[lang]}</dd></div>}
             <div><dt>{text.work}</dt><dd>{project.work[lang]}</dd></div>
           </dl>
           <div className="archive-actions" style={{display: 'flex', flexWrap: 'wrap', gap: '8px 24px'}}>

@@ -187,3 +187,18 @@
   html[data-case-zoom]::view-transition-old(root),
   html[data-case-zoom]::view-transition-new(root) { animation-duration: 160ms; }
 }
+
+/* A shared case has no tab list. Give the image and its explanation both columns. */
+.project-archive[data-single] {display:block;}
+.project-archive[data-single] .archive-heading {min-height:0;}
+.archive-heading .case-category {font:550 1.05rem/1.4 var(--type-interface);margin:0;color:var(--sea-ink);}
+.project-archive[data-single] .archive-detail {display:block;}
+@media(min-width:761px){
+ .project-archive[data-single] .archive-entry {display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);gap:1.2rem clamp(2rem,4vw,5rem);align-content:start;align-items:start;}
+ .project-archive[data-single] .case-reader {grid-row:1/5;}
+ .project-archive[data-single] :is(.archive-heading,.archive-detail,.archive-actions) {grid-column:2;margin:0;}
+}
+.lightbox .lightbox-caption {flex-wrap:wrap;}
+.lightbox .lightbox-controls {display:inline-flex;gap:6px;align-items:center;margin-inline-start:auto;}
+.lightbox .lightbox-controls button {position:static;transform:none;min-width:44px;height:44px;}
+.lightbox .gallery-screen {aspect-ratio:16/9;width:min(1200px,calc(100vw - 2.5rem),calc((100dvh - 10rem)*16/9));}

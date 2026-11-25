@@ -1,5 +1,5 @@
 import { useLang } from '../lib/language';
-import { useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import '../styles/ambient-sound.css';
 
 // Four slow bars in D major, with a sparse answering phrase an octave above the bass.
@@ -41,8 +41,9 @@ async function renderMelody() {
   return offline.startRendering();
 }
 
-export default function AmbientSound() {
-  const kk=useLang()==='kk';
+const SoundContext = createContext<{playing:boolean; failed:boolean; toggle:()=>void} | null>(null);
+
+export function SoundProvider({children}:{children: ReactNode}) {
   const audio = useRef<AudioContext | null>(null);
   const master = useRef<GainNode | null>(null);
   const pauseTimer = useRef<number | undefined>(undefined);
@@ -147,10 +148,18 @@ export default function AmbientSound() {
     }
   }
 
+  return <SoundContext.Provider value={{playing,failed,toggle}}>{children}</SoundContext.Provider>;
+}
+
+export default function AmbientSound({inHeader=false}:{inHeader?: boolean}) {
+  const kk=useLang()==='kk';
+  const state=useContext(SoundContext);
+  if (!state) return null;
+  const {playing,failed,toggle}=state;
   if (typeof AudioContext === 'undefined' || typeof OfflineAudioContext === 'undefined') return null;
   const label=kk?(playing?'Әуенді өшіру':'Әуенді қосу'):(playing?'Выключить мелодию':'Включить мелодию');
   return (
-    <button type="button" className="ambient-sound" aria-label={kk?'Фондық әуен':'Фоновая мелодия'} aria-pressed={playing}
+    <button type="button" className={inHeader ? "ambient-sound header-sound" : "ambient-sound footer-sound"} aria-label={kk?'Фондық әуен':'Фоновая мелодия'} aria-pressed={playing}
       onClick={toggle} title={failed ? (kk?'Әуен қосылмады. Қайталап көріңіз':'Не удалось включить мелодию. Попробовать снова') : label}>
       <svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 9.5h3L12 5v14l-5-4.5H4z" />

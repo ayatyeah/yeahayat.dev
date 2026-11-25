@@ -23,6 +23,7 @@ export default defineConfig(({ command }) => ({
         const description = escape(project.benefit.ru);
         const url = 'https://yeahayat.dev/work/' + project.slug;
         const html = String(index.source)
+          .replace('data-page="home"', 'data-page="projects"')
           .replace(/<title>.*?<\/title>/, '<title>' + title + '</title>')
           .replace(/(property="og:title" content=")[^"]*/, '$1' + title)
           .replace(/(property="og:description" content=")[^"]*/, '$1' + description)

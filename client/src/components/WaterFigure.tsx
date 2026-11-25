@@ -24,5 +24,13 @@ export default function WaterFigure({kind}:{kind:string}) {
   }
   const label = actions[kind]?.[kk ? 1 : 0];
   return <button type="button" data-water-figure={kind} className="water-figure"
-    aria-label={label} title={label}><canvas aria-hidden="true"/></button>;
+    aria-label={label} title={label} onClick={event => {
+      if (event.currentTarget.dataset.figureFallback !== 'wheat') return;
+      window.dispatchEvent(new Event('water-splash'));
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const canvas = event.currentTarget.querySelector('canvas');
+      canvas?.getAnimations().forEach(animation => animation.cancel());
+      canvas?.animate([{transform:'rotate(0deg)'},{transform:'rotate(-17deg)'},{transform:'rotate(9deg)'},{transform:'rotate(0deg)'}],
+        {duration:750,easing:'ease-in-out'});
+    }}><canvas aria-hidden="true"/></button>;
 }

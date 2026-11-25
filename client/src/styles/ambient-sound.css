@@ -16,3 +16,10 @@
 }
 .ambient-sound:hover, .ambient-sound:focus-visible { background: #fff; }
 .ambient-sound:focus-visible { outline: 2px solid #153d5d; outline-offset: 3px; }
+.header-sound {display:none;}
+@media(max-width:690px),(pointer:coarse) and (max-width:760px) {
+  .ambient-sound.header-sound,.ambient-sound.footer-sound {position:static;display:grid;flex:none;}
+  .ambient-sound.header-sound {width:44px;height:44px;background:transparent;color:inherit;border:0;}
+  .ambient-sound.footer-sound {order:3;}
+  .tide-footer {padding-inline-end:16px;}
+}

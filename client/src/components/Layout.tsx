@@ -107,7 +107,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       document.title = shared.title + ' · YeahAyat';
       document.querySelector('meta[name=description]')?.setAttribute('content',shared.benefit[kk ? 'kk' : 'ru']);
     }
-    document.body.setAttribute('data-page', PAGE_KEYS[location.pathname] ?? 'home');
+    document.body.setAttribute('data-page', shared ? 'projects' : PAGE_KEYS[location.pathname] ?? 'home');
   }, [location.pathname,kk]);
 
   return (
@@ -126,6 +126,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 {kk?({'/projects':'Жобалар','/contact':'Байланыс','/github':'GitHub'}[item.to]??item.label):item.label}
               </TransitionLink>
             ))}
+            <AmbientSound inHeader />
             <LanguageToggle />
             <ThemeToggle />
           </nav>
@@ -133,7 +134,6 @@ export default function Layout({ children }: { children: ReactNode }) {
       )}
 
       {children}
-      <AmbientSound />
 
       {location.pathname === '/' && <section className="horizon-contact" id="contact-horizon" aria-labelledby="horizon-heading">
         <div className="horizon-message">
@@ -146,6 +146,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         </div>
       </section>}
       <footer className="tide-footer">
+        <AmbientSound />
         <p>© {new Date().getFullYear()} YeahAyat</p>
         <TransitionLink to="/privacy">{kk?'Құпиялық саясаты':'Политика конфиденциальности'}</TransitionLink>
       </footer>

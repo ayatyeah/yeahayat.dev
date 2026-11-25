@@ -37,18 +37,20 @@ export default function CasePassage() {
         cases.toggleAttribute('data-leaf-moving',moving);
         if(moving) {
           const alpha=Math.min(clamp(t/.085),clamp((1-t)/.085));
-          const turn=ease(clamp(t/.80));
+          // Finish the geometric move before dissolving the two surfaces.
+          const travel=clamp((t-.045)/.85);
+          const turn=ease(clamp(travel/.86));
           // Interpolate the page in document coordinates: reverse scrolling
           // visits the very same hinge angles, sizes and positions.
-          const x=lerp(source.x,dest.x,ease(t));
-          const y=lerp(source.y,dest.y,t);
+          const x=lerp(source.x,dest.x,ease(travel));
+          const y=lerp(source.y,dest.y,travel);
           const w=lerp(source.w,dest.w,turn), h=lerp(source.h,dest.h,turn);
           leaf.style.transform='translate3d('+x+'px,'+y+'px,0) rotate('+lerp(-7,0,turn)+'deg) scale('+w/dest.w+','+h/dest.h+')';
           leaf.style.opacity=String(alpha);
           leaf.style.setProperty('--hinge',(cover.getAttribute('aria-pressed')==='true' ? -145-turn*23 : -22-turn*146)+'deg');
           leaf.style.setProperty('--cover-alpha',String(1-ease(clamp((t-.55)/.35))));
           cover.style.setProperty('--book-visible',String(1-clamp(t/.085)));
-          target.style.opacity=String(1-alpha);
+          target.style.opacity=travel === 1 ? '1' : String(1-clamp(t/.085));
         } else {
           cover.style.setProperty('--book-visible', t === 1 ? '0' : '1');
           target.style.removeProperty('opacity');

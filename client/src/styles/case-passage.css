@@ -41,7 +41,18 @@
  .page-main-home .home-cases .archive-banner h2 {font-size:clamp(46px,5.6vw,96px);}
 }
 @media(max-width:700px){
- .page-main-home .home-cases .archive-banner .case-folio {order:4;margin:1.4rem 0 0;}
+ .page-main-home .home-cases .archive-banner {
+   display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:.5rem .85rem;
+   align-content:center;text-align:left;padding:2.3rem 4vw;
+ }
+ .page-main-home .home-cases .archive-banner .case-folio {
+   grid-area:1/1/4/2;order:0;inset:auto;width:100%;height:clamp(110px,31vw,170px);margin:0;
+ }
+ .page-main-home .home-cases .archive-banner :is(h2,.business-case-note,.scene-link) {
+   grid-column:2;max-width:100%;min-width:0;justify-self:start;text-align:left;margin:0;
+ }
+ .page-main-home .home-cases .archive-banner h2 {font-size:clamp(28px,7vw,44px);overflow-wrap:break-word;}
+ .page-main-home .home-cases .archive-banner .business-case-note {font-size:clamp(14px,3.7vw,17px);line-height:1.45;}
  .project-edition #case-yeahgrind .edition-plate {order:-1;}
  .project-edition .edition-plate figcaption {flex-wrap:wrap;column-gap:.5rem;row-gap:0;}
  .project-edition .edition-case .edition-plate figcaption .water-figure canvas {width:58px;height:58px;}
@@ -64,4 +75,19 @@
 }
 [data-theme=dark] .letter-note > div::before,[data-theme=dark] .workshop-story::before {
   background:radial-gradient(ellipse at 44% 52%,#021d33a6,transparent 72%);
+}
+.water-frame[data-reading] .water-touch-hint {visibility:hidden;}
+/* Keep copy and controls legible as the bright seabed passes behind them. */
+#contact-horizon .horizon-message,.sun-invitation {position:relative;isolation:isolate;}
+#contact-horizon .horizon-message::before,.sun-invitation::before {
+  content:'';position:absolute;inset:-22% -7%;pointer-events:none;z-index:-1;
+  background:radial-gradient(ellipse,#063247c2 0%,#10394b80 45%,transparent 72%);
+}
+@media (min-width:701px) and (max-height:540px) {
+ .page-main-home .water-art {height:56svh;top:calc((1 - var(--aperture,0))*14svh);}
+ .page-main-home .studio-author {padding:0 .65rem 2svh;min-height:33svh;}
+ .studio-author h2 {font-size:clamp(24px,6.5svh,32px);}
+ .studio-author p {line-height:1.3;}
+ .studio-author .author-links {margin-top:.25rem;}
+ .water-touch-hint {display:none;}
 }

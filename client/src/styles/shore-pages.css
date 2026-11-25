@@ -88,3 +88,5 @@
     letter-spacing: -.05em;
   }
 }
+
+.shore-page :is(.contact-board,.form-shell,.policy).reveal {opacity:1;transform:none;transition:none;}

@@ -4,6 +4,7 @@ import type { LetterPose } from '../lib/liquidLetters';
 import { useLang } from '../lib/language';
 import { TransitionLink } from '../lib/transition';
 import LanguageToggle from './LanguageToggle';
+import AmbientSound from './AmbientSound';
 import ThemeToggle from './ThemeToggle';
 import '../styles/water.css';
 
@@ -83,6 +84,7 @@ export default function WaterScene({ name, introduction, discuss }: { name: stri
       if (disposed) return;
       const y = getVisualScrollY();
       const progress = reduced.matches ? 0 : clamp((y - sectionTop) / travel);
+      panel.toggleAttribute('data-reading', y > sectionTop + 12);
       const readLine = y + window.innerHeight * .50;
       blocks.forEach((block,i) => {
         const position = (midpoints[i] - y) / window.innerHeight;
@@ -165,7 +167,7 @@ export default function WaterScene({ name, introduction, discuss }: { name: stri
         <a className="water-brand" href="#top">yeah<span>ayat</span><small>.dev</small></a>
         <nav aria-label={lang === 'kk' ? 'Негізгі мәзір' : 'Основное меню'}>
           <a href="#about">{labels.nav[0]}</a><a href="#cases">{labels.nav[1]}</a>
-          <TransitionLink to="/contact">{labels.nav[2]}</TransitionLink><LanguageToggle /><ThemeToggle />
+          <TransitionLink to="/contact">{labels.nav[2]}</TransitionLink><AmbientSound inHeader /><LanguageToggle /><ThemeToggle />
         </nav>
         <div className="letter-keyboard" role="group" aria-label={lang === 'kk' ? 'Су әріптері' : 'Водяные буквы'}>
           {letters.map((letter,index) => <button key={letter} type="button"

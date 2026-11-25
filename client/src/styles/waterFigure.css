@@ -25,3 +25,7 @@
 .water-book[data-book-fallback=true]::after {background:linear-gradient(115deg,#97cedb,#f0ffff,#a1c6de)}
 .water-book[data-book-fallback=true][aria-expanded=true]::after {transform:rotateY(-157deg)}
 @media(prefers-reduced-motion:reduce){.water-book[data-book-fallback=true]::after{transition:none}}
+.water-figure[data-figure-fallback=wheat] canvas {
+  background:url('/environment/water-wheat.png') center/contain no-repeat;
+  transform-origin:50% 86%;
+}

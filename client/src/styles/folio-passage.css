@@ -21,7 +21,7 @@
 }
 @media(prefers-reduced-motion:no-preference) {
   .page-main-home .water-journal[data-motion=on] .services-ledger.service-workbench {
-    padding-bottom:105svh;
+    padding-bottom:clamp(64px,26svh,260px);
   }
   .page-main-home .water-journal[data-motion=on] .workbench-preview figcaption {
     opacity:clamp(0,calc((.70 - var(--folio-flight,0))*5),1);

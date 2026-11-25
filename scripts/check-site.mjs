@@ -34,7 +34,7 @@ function slug(p) {
   return p === '/' ? 'home' : p.replace(/^\//, '');
 }
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
 
 for (const viewport of VIEWPORTS) {
   const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height } });
@@ -77,7 +77,7 @@ for (const viewport of VIEWPORTS) {
     await page.goto(baseURL + '/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(500);
 
-    const firstShot = page.locator('.case-shot').first();
+    const firstShot = page.locator('#case-yeahgrind .edition-read');
     await firstShot.scrollIntoViewIfNeeded();
     await firstShot.click();
 
